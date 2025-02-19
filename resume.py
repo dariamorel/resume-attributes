@@ -1,7 +1,7 @@
 from natasha import (Segmenter, Doc)
 from dictionaries import sections_dict
 
-class Sections:
+class Resume:
     def __init__(self, text: str):
         self.__main_info = None
         self.__work_experience = None
@@ -11,16 +11,16 @@ class Sections:
         self.__divide_into_sections(text)
 
     # public:
-    def get_main_info(self) -> list:
+    def get_main_info(self) -> Doc:
         return self.__main_info
 
-    def get_work_experience(self) -> list:
+    def get_work_experience(self) -> Doc:
         return self.__work_experience
 
-    def get_education(self) -> list:
+    def get_education(self) -> Doc:
         return self.__education
 
-    def get_skills(self) -> list:
+    def get_skills(self) -> Doc:
         return self.__skills
 
     # private:
@@ -57,17 +57,24 @@ class Sections:
         if start < 0 or end >= len(doc.tokens):
             ValueError("Index is out of range.")
 
+        # делаем срез дока
+        start_ind = doc.tokens[start].start
+        end_ind = doc.tokens[end-1].stop
+
+        new_doc = Doc(doc.text[start_ind:end_ind])
+        new_doc.tokens = doc.tokens[start:end]
+
         match cur_section:
             case "main_info":
-                self.__main_info = doc.tokens[start:end]
+                self.__main_info = new_doc
                 return
             case "work_experience":
-                self.__work_experience = doc.tokens[start:end]
+                self.__work_experience = new_doc
                 return
             case "education":
-                self.__education = doc.tokens[start:end]
+                self.__education = new_doc
                 return
             case "skills":
-                self.__skills = doc.tokens[start:end]
+                self.__skills = new_doc
                 return
         raise ValueError("Invalid section name.")
