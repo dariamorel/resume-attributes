@@ -1,5 +1,31 @@
+from natasha import (
+    Segmenter,
+    MorphVocab,
+
+    NewsEmbedding,
+    NewsMorphTagger,
+    NewsSyntaxParser,
+    NewsNERTagger,
+
+    PER,
+    NamesExtractor,
+    DatesExtractor,
+
+    Doc
+)
 from natasha import (Segmenter, Doc)
 from dictionaries import sections_dict
+
+segmenter = Segmenter()
+morph_vocab = MorphVocab()
+
+emb = NewsEmbedding()
+morph_tagger = NewsMorphTagger(emb)
+syntax_parser = NewsSyntaxParser(emb)
+ner_tagger = NewsNERTagger(emb)
+
+names_extractor = NamesExtractor(morph_vocab)
+dates_extractor = DatesExtractor(morph_vocab)
 
 class Resume:
     def __init__(self, text: str):
@@ -29,7 +55,6 @@ class Resume:
             ValueError("Invalid argument type.")
 
         # токенизация текста
-        segmenter = Segmenter()
         doc = Doc(text)
         doc.segment(segmenter)
 
@@ -62,7 +87,10 @@ class Resume:
         end_ind = doc.tokens[end-1].stop
 
         new_doc = Doc(doc.text[start_ind:end_ind])
-        new_doc.tokens = doc.tokens[start:end]
+        new_doc.segment(segmenter)
+        new_doc.tag_morph(morph_tagger)
+        new_doc.parse_syntax(syntax_parser)
+        new_doc.tag_ner(ner_tagger)
 
         match cur_section:
             case "main_info":

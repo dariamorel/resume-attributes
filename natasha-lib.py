@@ -56,6 +56,7 @@ cleaned_text = clean_text(text)
 
 resume = Resume(cleaned_text)
 
-education_doc = resume.get_education()
-
-
+education_doc = resume.get_main_info()
+section = Section(education_doc)
+for token in section.get_list_of_tokens():
+    print(token)
