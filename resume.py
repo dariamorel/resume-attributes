@@ -15,6 +15,8 @@ from natasha import (
 )
 from natasha import (Segmenter, Doc)
 from dictionaries import sections_dict
+from section import MainInfo, WorkExperience, Education, Skills
+from document import Document
 
 segmenter = Segmenter()
 morph_vocab = MorphVocab()
@@ -37,16 +39,16 @@ class Resume:
         self.__divide_into_sections(text)
 
     # public:
-    def get_main_info(self) -> Doc:
+    def get_main_info(self) -> MainInfo:
         return self.__main_info
 
-    def get_work_experience(self) -> Doc:
+    def get_work_experience(self) -> WorkExperience:
         return self.__work_experience
 
-    def get_education(self) -> Doc:
+    def get_education(self) -> Education:
         return self.__education
 
-    def get_skills(self) -> Doc:
+    def get_skills(self) -> Skills:
         return self.__skills
 
     # private:
@@ -91,18 +93,19 @@ class Resume:
         new_doc.tag_morph(morph_tagger)
         new_doc.parse_syntax(syntax_parser)
         new_doc.tag_ner(ner_tagger)
+        new_doc = Document(new_doc)
 
         match cur_section:
             case "main_info":
-                self.__main_info = new_doc
+                self.__main_info = MainInfo(new_doc)
                 return
             case "work_experience":
-                self.__work_experience = new_doc
+                self.__work_experience = WorkExperience(new_doc)
                 return
             case "education":
-                self.__education = new_doc
+                self.__education = Education(new_doc)
                 return
             case "skills":
-                self.__skills = new_doc
+                self.__skills = Skills(new_doc)
                 return
         raise ValueError("Invalid section name.")

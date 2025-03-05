@@ -1,29 +1,11 @@
-from natasha import (
-    Segmenter,
-    MorphVocab,
-
-    NewsEmbedding,
-    NewsMorphTagger,
-    NewsSyntaxParser,
-    NewsNERTagger,
-
-    PER,
-    NamesExtractor,
-    DatesExtractor,
-
-    Doc
-)
-
-# Функция для получения детей токена
-def get_children(token_id, doc):
-    children = []
-    for token in doc.tokens:
-        if token.head_id == token_id:  # Если токен зависит от текущего
-            children.append(token)
-    return children
+from natasha import (Doc)
+from document import Document
 
 class Section:
-    def __init__(self, section_doc: Doc):
+    def __init__(self, section_doc: Document):
+        """
+        :param section_doc: Document
+        """
         self.__list_of_tokens = list()
 
         added_words = {i: False for i in range(len(section_doc.tokens))}
@@ -35,8 +17,7 @@ class Section:
         token_to_ent = {i: -1 for i in range(len(section_doc.tokens))}
         for i, ent in enumerate(section_doc.spans):
             for token in ent.tokens:
-                token_i = int(token.id[2:]) - 1
-                token_to_ent[token_i] = i
+                token_to_ent[token.i] = i
 
         for token in head_tokens:
             token_list = list()
@@ -50,21 +31,18 @@ class Section:
 
     # private
     def __tokens_division(self, token, token_list: list, section_doc: Doc, added_words, token_to_ent):
-        token_i = int(token.id[2:]) - 1
-
         # слово еще не добавили
-        if not added_words[token_i]:
+        if not added_words[token.i]:
             # если ent и еще не добавлен
-            if token_to_ent[token_i] != -1:
-                ent = section_doc.spans[token_to_ent[token_i]]
+            if token_to_ent[token.i] != -1:
+                ent = section_doc.spans[token_to_ent[token.i]]
                 self.__list_of_tokens.append(ent.text)
                 # помечаем, что добавили слово
                 for ent_token in ent.tokens:
-                    ent_token_i = int(ent_token.id[2:]) - 1
-                    added_words[ent_token_i] = True
+                    added_words[ent_token.i] = True
 
                 # пробегаемся по детям
-                for child in get_children(token.id, section_doc):
+                for child in token.children:
                     clear_token_list = list()
                     self.__tokens_division(child, clear_token_list, section_doc, added_words, token_to_ent)
                     if clear_token_list:
@@ -74,13 +52,13 @@ class Section:
             # если не ent
             token_list.append(token.text)
             # пробегаемся по детям
-            for child in get_children(token.id, section_doc):
+            for child in token.children:
                 self.__tokens_division(child, token_list, section_doc, added_words, token_to_ent)
             return
 
         # если слово уже добавлено
         # пробегаемся по детям
-        for child in get_children(token.id, section_doc):
+        for child in token.children:
             clear_token_list = list()
             self.__tokens_division(child, clear_token_list, section_doc, added_words, token_to_ent)
             if clear_token_list:

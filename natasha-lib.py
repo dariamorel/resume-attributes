@@ -1,4 +1,6 @@
 import re
+import time
+
 import fitz
 from resume import Resume
 from section import Section
@@ -17,6 +19,7 @@ from natasha import (
 
     Doc
 )
+from document import Word, Document
 
 segmenter = Segmenter()
 morph_vocab = MorphVocab()
@@ -54,9 +57,9 @@ file = open("test.txt", "r")
 text = file.read()
 cleaned_text = clean_text(text)
 
+cur_time = time.time()
 resume = Resume(cleaned_text)
+print(time.time() - cur_time)
 
-education_doc = resume.get_main_info()
-section = Section(education_doc)
-for token in section.get_list_of_tokens():
-    print(token)
+
+
