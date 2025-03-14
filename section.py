@@ -24,6 +24,7 @@ from document import Document, Date
 import re
 from natasha.extractors import Match
 from natasha import obj
+from ent import Ent
 
 segmenter = Segmenter()
 emb = NewsEmbedding()
@@ -217,7 +218,7 @@ class Section:
         while i < len(self.doc.tokens):
             token = self.doc.tokens[i]
             if token_to_date[token.i] != -1 and last_was_span:
-                result_list.append(result.copy())
+                result_list.append(Ent(self.__result_to_str(result)))
                 result.clear()
                 result.append(self.dates[token_to_date[token.i]])
                 i = self.dates[token_to_date[token.i]].tokens[-1].i + 1
@@ -231,22 +232,21 @@ class Section:
                 last_was_span = True
             else:
                 i += 1
-        result_list.append(result)
 
-        # форматируем return
-        for j, result in enumerate(result_list):
-            formated_result = str()
-            for i, cur_obj in enumerate(result):
-                formated_result += cur_obj.text
-                # текущий объект дата и следующий - дата, связанная с текущей
-                if type(cur_obj) == Date and (i + 1 < len(result) and result[i + 1] == cur_obj.connection):
-                    formated_result += ' - '
-                else:
-                    formated_result += '\n'
-
-            result_list[j] = formated_result
+        result_list.append(Ent(self.__result_to_str(result)))
 
         return result_list
+
+    def __result_to_str(self, result):
+        formated_result = str()
+        for i, cur_obj in enumerate(result):
+            formated_result += cur_obj.text
+            # текущий объект дата и следующий - дата, связанная с текущей
+            if type(cur_obj) == Date and (i + 1 < len(result) and result[i + 1] == cur_obj.connection):
+                formated_result += ' - '
+            else:
+                formated_result += '\n'
+        return formated_result
 
 
 class MainInfo(Section):

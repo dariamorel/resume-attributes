@@ -47,23 +47,23 @@ from resume import sections_dict
 def main():
     from natasha import obj
 
-    # file = open("test.txt", "r")
-    # text = file.read()
+    file = open("test.txt", "r")
+    text = file.read()
 
-    pdf_path = "/home/daria/курсач/резюме/Perl-программист.pdf"
-    pdf_doc = fitz.open(pdf_path)
-    all_text = ""
-    for page in pdf_doc:
-        all_text += page.get_text()
-
-    text = all_text.replace("\n", ", ").replace(".", ",")
+    # pdf_path = "/home/daria/курсач/резюме/Perl-программист.pdf"
+    # pdf_doc = fitz.open(pdf_path)
+    # all_text = ""
+    # for page in pdf_doc:
+    #     all_text += page.get_text()
+    #
+    # text = all_text.replace("\n", ", ").replace(".", ",")
     # print(text)
 
     # cur_time = time.time()
     resume = Resume(text)
     ed = resume.get_education()
     for obj in ed.get_info():
-        print(obj)
+        print(obj.text)
     # print(time.time() - cur_time)
 
 
