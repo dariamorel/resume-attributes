@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import natasha
 
 
@@ -29,15 +31,19 @@ class Document(natasha.doc.Doc):
             ValueError("Not enough data for doc.")
         super().__init__(doc.text, doc.tokens, doc.spans, doc.sents)
 
-        self.tokens = self.__word_tokens(self.tokens)
+        if self.tokens:
+            self.tokens = self.__word_tokens(self.tokens)
 
-        self.__word_spans(self.spans)
+        if self.spans:
+            self.__word_spans(self.spans)
 
-        self.__word_sents(self.sents)
+        if self.sents:
+            self.__word_sents(self.sents)
 
-        self.__add_children()
+        if self.tokens and self.tokens[0].id:
+            self.__add_children()
 
-        self.__add_head()
+            self.__add_head()
 
     def __word_tokens(self, tokens: list):
         """  
@@ -55,7 +61,8 @@ class Document(natasha.doc.Doc):
         for span in spans:
             if span.tokens is None:
                 ValueError("No tokens in span.")
-            span.tokens = self.__word_tokens(span.tokens)
+            if span.tokens:
+                span.tokens = self.__word_tokens(span.tokens)
         return spans
 
     def __word_sents(self, sents: list):
@@ -66,8 +73,10 @@ class Document(natasha.doc.Doc):
         for sent in sents:
             if sent.tokens is None or sent.spans is None:
                 ValueError("No tokens or no spans in sent.")
-            sent.tokens = self.__word_tokens(sent.tokens)
-            sent.spans = self.__word_spans(sent.spans)
+            if sent.tokens:
+                sent.tokens = self.__word_tokens(sent.tokens)
+            if sent.spans:
+                sent.spans = self.__word_spans(sent.spans)
 
     def __add_children(self):
         """  
@@ -97,3 +106,26 @@ class Date:
         self.fact = match.fact
         self.tokens = None
         self.connection = None
+        self.__text = None
+
+    @property
+    def text(self):
+        if self.__text:
+            return self.__text
+
+        months = {
+            1: "январь", 2: "февраль", 3: "март", 4: "апрель",
+            5: "май", 6: "июнь", 7: "июль", 8: "август",
+            9: "сентябрь", 10: "октябрь", 11: "ноябрь", 12: "декабрь"
+        }
+
+        if self.fact.day and self.fact.month and self.fact.year:
+            formated_date = datetime(year=self.fact.year, month=self.fact.month, day=self.fact.day)
+            self.__text =  formated_date.strftime("%d %B %Y года")
+        elif self.fact.month and self.fact.year:
+            self.__text = f"{months[self.fact.month]} {self.fact.year} года"
+        elif self.fact.year:
+            formated_date = datetime(year=self.fact.year, month=1, day=1)
+            self.__text = formated_date.strftime("%Y год")
+
+        return self.__text

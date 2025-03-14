@@ -23,7 +23,6 @@ from natasha import (
 )
 from document import Word, Document, Date
 from natasha.extractors import Match
-from section import format_date
 
 segmenter = Segmenter()
 morph_vocab = MorphVocab()
@@ -49,7 +48,8 @@ def main():
     from natasha import obj
 
     # file = open("test.txt", "r")
-    # text = file.read().replace("\n", ", ").replace(".", ",")
+    # text = file.read()
+
     pdf_path = "/home/daria/курсач/резюме/Perl-программист.pdf"
     pdf_doc = fitz.open(pdf_path)
     all_text = ""
@@ -61,8 +61,9 @@ def main():
 
     # cur_time = time.time()
     resume = Resume(text)
-    ed = resume.get_work_experience()
-    print(ed.get_info())
+    ed = resume.get_education()
+    for obj in ed.get_info():
+        print(obj)
     # print(time.time() - cur_time)
 
 

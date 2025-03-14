@@ -33,38 +33,29 @@ ner_tagger = NewsNERTagger(emb)
 morph_vocab = MorphVocab()
 dates_extractor = DatesExtractor(morph_vocab)
 
-
-def format_date(date: Date):
-    """  
-    Функция форматирует дату объекта Date    :param date: объект Date    :return: строка отформатированной даты  
-    """
-    if date.fact.day and date.fact.month and date.fact.year:
-        formated_date = datetime(year=date.fact.year, month=date.fact.month, day=date.fact.day)
-        return formated_date.strftime("%d %B %Y года")
-    elif date.fact.month and date.fact.year:
-        formated_date = datetime(year=date.fact.year, month=date.fact.month, day=1)
-        return formated_date.strftime("%B %Y года")
-    elif date.fact.year:
-        formated_date = datetime(year=date.fact.year, month=1, day=1)
-        return formated_date.strftime("%Y год")
-
-
 class Section:
     def __init__(self, text: str):
-        doc = Doc(text)
+        spans_doc = Doc(text.replace('\n', ", "))
+        spans_doc.segment(segmenter)
+        spans_doc.tag_ner(ner_tagger)
+        spans_doc = Document(spans_doc)
+        spans = spans_doc.spans
+
+        doc = Doc(re.sub(r'[.,?!]', '', text))
         doc.segment(segmenter)
         doc.tag_morph(morph_tagger)
         doc.parse_syntax(syntax_parser)
-        doc.tag_ner(ner_tagger)
 
         self.doc = Document(doc)
 
+        self.spans = self.__add_tokens_to_list(spans)
         self.__dates = None
 
     @property
     def dates(self):
         """  
-        Функция заполняет поле __dates, если оно None, или возвращает существующее поле __dates.        :return: список из объектов Date  
+        Функция заполняет поле __dates, если оно None, или возвращает существующее поле __dates.
+        :return: список из объектов Date
         """
         if self.__dates is not None:
             return self.__dates
@@ -112,7 +103,9 @@ class Section:
 
     def __add_date_connections(self, dates: list):
         """  
-        Функция заполняет объекту Date поле connection, если дата соединена с другой через '-'.        Также функция добавляет пропущенные в DatesExtractor одиноко стоящие года.        :param dates: список из объектов Date        :return: отформатированный список с датами  
+        Функция заполняет объекту Date поле connection, если дата соединена с другой через '-'.
+        Также функция добавляет пропущенные в DatesExtractor одиноко стоящие года.
+        :param dates: список из объектов Date        :return: отформатированный список с датами
         """
         dates_to_add = list()
         for ind, date in enumerate(dates):
@@ -171,49 +164,89 @@ class Section:
 
         return dates + dates_to_add
 
-    def get_info(self):
-        result = list()
+    def __add_tokens_to_list(self, input_list: list):
+        i, j = 0, 0
+        token_list = list()
 
+        while i < len(self.doc.tokens) and j < len(input_list):
+            token = self.doc.tokens[i]
+            cur_obj = input_list[j]
+            if len(token_list) > 0 and cur_obj.tokens[-1].text in token.text:
+                token_list.append(token)
+                cur_obj.tokens = token_list.copy()
+                cur_obj.start = token_list[0].start
+                cur_obj.stop = token_list[-1].stop
+                token_list.clear()
+                i += 1
+                j += 1
+            elif len(token_list) > 0 and (len(token_list) < len(cur_obj.tokens) and cur_obj.tokens[len(token_list)].text in token.text):
+                token_list.append(token)
+                i += 1
+            elif cur_obj.tokens[0].text in token.text and cur_obj.tokens[-1].text in token.text:
+                cur_obj.tokens = [token]
+                cur_obj.start = token.start
+                cur_obj.stop = token.stop
+                i += 1
+                j += 1
+            elif cur_obj.tokens[0].text in token.text:
+                token_list.append(token)
+                i += 1
+            else:
+                i += 1
+        return input_list
+
+    def get_info(self):
         # токены, принадлежащие датам
         token_to_date = {i: -1 for i in range(len(self.doc.tokens))}
         for i, date in enumerate(self.dates):
             for token in date.tokens:
                 token_to_date[token.i] = i
 
-                # токены, принадлежащие сущностям
+        # токены, принадлежащие сущностям
         token_to_span = {i: -1 for i in range(len(self.doc.tokens))}
-        for i, span in enumerate(self.doc.spans):
+        for i, span in enumerate(self.spans):
             for token in span.tokens:
                 token_to_span[token.i] = i
 
-                # добавляем в result именованные сущности и даты
+        result_list = list()
+
+        # добавляем в result именованные сущности и даты
         i = 0
+        result = list()
+        last_was_span = False
         while i < len(self.doc.tokens):
             token = self.doc.tokens[i]
-            if token_to_date[token.i] != -1:
+            if token_to_date[token.i] != -1 and last_was_span:
+                result_list.append(result.copy())
+                result.clear()
                 result.append(self.dates[token_to_date[token.i]])
                 i = self.dates[token_to_date[token.i]].tokens[-1].i + 1
-            elif token_to_span[token.i] != -1 and self.doc.spans[token_to_span[token.i]].type == ORG:
-                result.append(self.doc.spans[token_to_span[token.i]])
-                i = self.doc.spans[token_to_span[token.i]].tokens[-1].i + 1
+                last_was_span = False
+            elif token_to_date[token.i] != -1:
+                result.append(self.dates[token_to_date[token.i]])
+                i = self.dates[token_to_date[token.i]].tokens[-1].i + 1
+            elif token_to_span[token.i] != -1 and self.spans[token_to_span[token.i]].type == ORG:
+                result.append(self.spans[token_to_span[token.i]])
+                i = self.spans[token_to_span[token.i]].tokens[-1].i + 1
+                last_was_span = True
             else:
                 i += 1
+        result_list.append(result)
 
-                # форматируем return
-        formated_result = str()
+        # форматируем return
+        for j, result in enumerate(result_list):
+            formated_result = str()
+            for i, cur_obj in enumerate(result):
+                formated_result += cur_obj.text
+                # текущий объект дата и следующий - дата, связанная с текущей
+                if type(cur_obj) == Date and (i + 1 < len(result) and result[i + 1] == cur_obj.connection):
+                    formated_result += ' - '
+                else:
+                    formated_result += '\n'
 
-        for i, cur_obj in enumerate(result):
-            # текущий объект дата и следующий - дата, связанная с текущей
-            if type(cur_obj) == Date and (i + 1 < len(result) and result[i + 1] == cur_obj.connection):
-                formated_result += format_date(cur_obj) + ' - '
-                # текущий объект просто дата
-            elif type(cur_obj) == Date:
-                formated_result += '\n' + format_date(cur_obj) + '\n'
-                # текущий объект именованная сущность
-            elif type(cur_obj) == natasha.doc.DocSpan:
-                formated_result += cur_obj.text + '\n'
+            result_list[j] = formated_result
 
-        return formated_result
+        return result_list
 
 
 class MainInfo(Section):
