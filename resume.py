@@ -14,7 +14,9 @@ from natasha import (
     Doc
 )
 from natasha import (Segmenter, Doc)
-from section import MainInfo, WorkExperience, Education, Skills
+
+from organizations import Organizations
+from section import MainInfo, Skills
 from document import Document
 import re
 import time
@@ -50,10 +52,10 @@ class Resume:
     def get_main_info(self) -> MainInfo:
         return self.__main_info
 
-    def get_work_experience(self) -> WorkExperience:
+    def get_work_experience(self) -> Organizations:
         return self.__work_experience
 
-    def get_education(self) -> Education:
+    def get_education(self) -> Organizations:
         return self.__education
 
     def get_skills(self) -> Skills:
@@ -83,6 +85,6 @@ class Resume:
                 skills = sections.group(i + 1)
 
         self.__main_info = MainInfo(main_info)
-        self.__work_experience = WorkExperience(work_experience)
-        self.__education = Education(education)
+        self.__work_experience = Organizations(work_experience)
+        self.__education = Organizations(education)
         self.__skills = Skills(skills)
