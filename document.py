@@ -1,5 +1,6 @@
 import natasha
 
+
 class Word(natasha.doc.DocToken):
     def __init__(self, token: natasha.doc.DocToken):
         super().__init__(token.start, token.stop, token.text, token.id, token.head_id, token.rel, token.pos,
@@ -7,20 +8,20 @@ class Word(natasha.doc.DocToken):
         self.head = None
         self.children = None
 
-
     @property
     def i(self):
-        """
-        :return: индекс слова в предложении
+        """  
+        :return: индекс слова в предложении  
         """
         return int(self.id.split('_')[1]) - 1
 
     @property
     def head_i(self):
-        """
-        :return: индекс родителя слова в предложении
+        """  
+        :return: индекс родителя слова в предложении  
         """
         return int(self.head_id.split('_')[1]) - 1
+
 
 class Document(natasha.doc.Doc):
     def __init__(self, doc: natasha.doc.Doc):
@@ -39,7 +40,7 @@ class Document(natasha.doc.Doc):
         self.__add_head()
 
     def __word_tokens(self, tokens: list):
-        """
+        """  
         :param tokens: лист токенов типа natasha.doc.DocToken
         :return: лист токенов типа Word
         """
@@ -47,7 +48,7 @@ class Document(natasha.doc.Doc):
         return token_list
 
     def __word_spans(self, spans: list):
-        """
+        """  
         :param spans: лист spans
         :return: отформатированный лист spans, где вместо DocToken стоит Word
         """
@@ -58,7 +59,7 @@ class Document(natasha.doc.Doc):
         return spans
 
     def __word_sents(self, sents: list):
-        """
+        """  
         :param sents: лист sents
         :return: отформатированный лист sents, где вместо DocToken стоит Word
         """
@@ -69,7 +70,7 @@ class Document(natasha.doc.Doc):
             sent.spans = self.__word_spans(sent.spans)
 
     def __add_children(self):
-        """
+        """  
         добавляет список детей для каждого токена
         """
         children = {token.i: [] for token in self.tokens}
@@ -82,8 +83,17 @@ class Document(natasha.doc.Doc):
             self.tokens[i].children = children[i]
 
     def __add_head(self):
-        """
+        """  
         добавляет head для каждого токена
         """
         for token in self.tokens:
             token.head = self.tokens[token.head_i]
+
+
+class Date:
+    def __init__(self, match):
+        self.start = match.start
+        self.stop = match.stop
+        self.fact = match.fact
+        self.tokens = None
+        self.connection = None

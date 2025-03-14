@@ -14,9 +14,10 @@ from natasha import (
     Doc
 )
 from natasha import (Segmenter, Doc)
-from dictionaries import sections_dict
 from section import MainInfo, WorkExperience, Education, Skills
 from document import Document
+import re
+import time
 
 segmenter = Segmenter()
 morph_vocab = MorphVocab()
@@ -29,6 +30,14 @@ ner_tagger = NewsNERTagger(emb)
 names_extractor = NamesExtractor(morph_vocab)
 dates_extractor = DatesExtractor(morph_vocab)
 
+sections_dict = {
+    "main_info": [],
+    "work_experience": ["Опыт работы", "Опыт", "Experience", "Work experience"],
+    "education": ["Образование", "Education"],
+    "skills": ["Навыки", "навыки", "Skills"]
+}
+
+
 class Resume:
     def __init__(self, text: str):
         self.__main_info = None
@@ -36,9 +45,8 @@ class Resume:
         self.__education = None
         self.__skills = None
 
-        self.__divide_into_sections(text)
+        self.__divide_to_sections(text)
 
-    # public:
     def get_main_info(self) -> MainInfo:
         return self.__main_info
 
@@ -51,61 +59,30 @@ class Resume:
     def get_skills(self) -> Skills:
         return self.__skills
 
-    # private:
-    def __divide_into_sections(self, text: str) -> None:
-        if not isinstance(text, str):
-            ValueError("Invalid argument type.")
+        # private:
 
-        # токенизация текста
-        doc = Doc(text)
-        doc.segment(segmenter)
+    def __divide_to_sections(self, text: str):
+        """    
+        Функция выделяет секцию из исходного текста.  
+        :param text: исходный текст        """
+        pattern = '|'.join(
+            ['|'.join(names) for key, names in sections_dict.items() if key != "main_info"])
 
-        # выделение секций по ключевым словам
-        start = 0
-        cur_section = "main_info"
-        for i, token in enumerate(doc.tokens):
-            if token.text.lower() in sections_dict["work_experience"]:
-                self.__add_to_section(doc, cur_section, start, i)
-                start = i + 1
-                cur_section = "work_experience"
-            elif token.text.lower() in sections_dict["education"]:
-                self.__add_to_section(doc, cur_section, start, i)
-                start = i + 1
-                cur_section = "education"
-            elif token.text.lower() in sections_dict["skills"]:
-                self.__add_to_section(doc, cur_section, start, i)
-                start = i + 1
-                cur_section = "skills"
+        sections = re.search(rf'(.*?)({pattern})(.*?)({pattern})(.*?)({pattern})(.*)', text,
+                             re.DOTALL | re.IGNORECASE)
 
-        self.__add_to_section(doc, cur_section, start, len(doc.tokens))
+        main_info = sections.group(1)
+        work_experience, education, skills = None, None, None
 
-    # добавляет секцию в нужное поле
-    def __add_to_section(self, doc: Doc, cur_section: str, start: int, end: int) -> None:
-        if start < 0 or end >= len(doc.tokens):
-            ValueError("Index is out of range.")
+        for i in range(2, 7, 2):
+            if sections.group(i) in sections_dict["work_experience"]:
+                work_experience = sections.group(i + 1)
+            elif sections.group(i) in sections_dict["education"]:
+                education = sections.group(i + 1)
+            elif sections.group(i) in sections_dict["skills"]:
+                skills = sections.group(i + 1)
 
-        # делаем срез дока
-        start_ind = doc.tokens[start].start
-        end_ind = doc.tokens[end-1].stop
-
-        new_doc = Doc(doc.text[start_ind:end_ind])
-        new_doc.segment(segmenter)
-        new_doc.tag_morph(morph_tagger)
-        new_doc.parse_syntax(syntax_parser)
-        new_doc.tag_ner(ner_tagger)
-        new_doc = Document(new_doc)
-
-        match cur_section:
-            case "main_info":
-                self.__main_info = MainInfo(new_doc)
-                return
-            case "work_experience":
-                self.__work_experience = WorkExperience(new_doc)
-                return
-            case "education":
-                self.__education = Education(new_doc)
-                return
-            case "skills":
-                self.__skills = Skills(new_doc)
-                return
-        raise ValueError("Invalid section name.")
+        self.__main_info = MainInfo(main_info)
+        self.__work_experience = WorkExperience(work_experience)
+        self.__education = Education(education)
+        self.__skills = Skills(skills)

@@ -2,6 +2,8 @@ import re
 import time
 
 import fitz
+import natasha
+
 from resume import Resume
 from section import Section
 from natasha import (
@@ -19,7 +21,9 @@ from natasha import (
 
     Doc
 )
-from document import Word, Document
+from document import Word, Document, Date
+from natasha.extractors import Match
+from section import format_date
 
 segmenter = Segmenter()
 morph_vocab = MorphVocab()
@@ -32,34 +36,35 @@ ner_tagger = NewsNERTagger(emb)
 names_extractor = NamesExtractor(morph_vocab)
 dates_extractor = DatesExtractor(morph_vocab)
 
+
 def clean_text(input_text):
     cleaned_input = re.sub(r'[.,?!]', '', input_text)
     return cleaned_input
 
-# Функция для получения детей токена
-def get_children(token_id, doc):
-    children = []
-    for token in doc.tokens:
-        if token.head_id == token_id:  # Если токен зависит от текущего
-            children.append(token)
-    return children
+
+from resume import sections_dict
 
 
-# pdf_path = "/home/daria/курсач/резюме/Perl-программист.pdf"
-# pdf_doc = fitz.open(pdf_path)
-# all_text = ""
-# for page in pdf_doc:
-#     all_text += page.get_text()
+def main():
+    from natasha import obj
 
-#print(all_text)
+    # file = open("test.txt", "r")
+    # text = file.read().replace("\n", ", ").replace(".", ",")
+    pdf_path = "/home/daria/курсач/резюме/Perl-программист.pdf"
+    pdf_doc = fitz.open(pdf_path)
+    all_text = ""
+    for page in pdf_doc:
+        all_text += page.get_text()
 
-file = open("test.txt", "r")
-text = file.read()
-cleaned_text = clean_text(text)
+    text = all_text.replace("\n", ", ").replace(".", ",")
+    # print(text)
 
-cur_time = time.time()
-resume = Resume(cleaned_text)
-print(time.time() - cur_time)
+    # cur_time = time.time()
+    resume = Resume(text)
+    ed = resume.get_work_experience()
+    print(ed.get_info())
+    # print(time.time() - cur_time)
 
 
-
+if __name__ == "__main__":
+    main()
