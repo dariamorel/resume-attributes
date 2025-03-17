@@ -61,9 +61,10 @@ def main():
 
     # cur_time = time.time()
     resume = Resume(text)
-    ed = resume.get_education()
+    ed = resume.get_main_info()
     for obj in ed.get_info():
-        print(obj.text)
+        if obj:
+            print(obj.text)
     # print(time.time() - cur_time)
 
 

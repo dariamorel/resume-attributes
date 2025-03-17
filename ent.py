@@ -12,5 +12,13 @@ def result_to_str(result):
     return formated_result
 
 class Ent:
-    def __init__(self, list_objects: list):
-        self.text = result_to_str(list_objects)
+    def __init__(self, input_info):
+        self.text = None
+        self.fact = input_info
+        if type(input_info) == list:
+            self.text = result_to_str(input_info)
+        elif type(input_info) == str:
+            self.text = input_info
+        elif type(input_info):
+            self.text = input_info.text
+

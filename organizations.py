@@ -35,16 +35,6 @@ class Organizations(Section):
         self.__dates = dates
         return self.dates
 
-    def __token_to_span(self, spans: list):
-        """
-        :return: словарь, где каждому токену соответствует индекс cущности, которой он принадлежит
-        """
-        token_to_span = {i: -1 for i in range(len(self.doc.tokens))}
-        for i, span in enumerate(spans):
-            for token in span.tokens:
-                token_to_span[token.i] = i
-        return token_to_span
-
     def __add_tokens_to_dates(self, dates: list):
         """
         Функция заполняет поле tokens для каждой date in dates.
@@ -76,7 +66,7 @@ class Organizations(Section):
         """
         # Добавляем одиноко стоящие года
         j = 0
-        token_to_date = self.__token_to_span(dates)
+        token_to_date = self.token_to_span(dates)
         for date in dates.copy():
             token, ind = None, None
             if (date.start_i - 2 >= 0) and is_year(self.doc.tokens[date.start_i - 2]) and (token_to_date[date.start_i - 2] == -1):
@@ -112,10 +102,10 @@ class Organizations(Section):
         :return: список объектов Ent
         """
         # токены, принадлежащие датам
-        token_to_date = self.__token_to_span(self.dates)
+        token_to_date = self.token_to_span(self.dates)
 
         # токены, принадлежащие сущностям
-        token_to_span = self.__token_to_span(self.spans)
+        token_to_span = self.token_to_span(self.spans)
 
         result, ent_list = list(), list()
 
