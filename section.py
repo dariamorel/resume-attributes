@@ -1,10 +1,11 @@
+from document import Document, Date
+import re
 import time
 from datetime import datetime
 import locale
 
 locale.setlocale(locale.LC_TIME, "ru_RU.UTF-8")
 
-import natasha
 from natasha import (
     Segmenter,
     MorphVocab,
@@ -20,11 +21,6 @@ from natasha import (
 
     Doc
 )
-from document import Document, Date
-import re
-from natasha.extractors import Match
-from natasha import obj
-from ent import Ent
 
 segmenter = Segmenter()
 emb = NewsEmbedding()
@@ -53,41 +49,56 @@ class Section:
 
         self.spans = self.__add_tokens_to_spans(spans)
 
-    def __add_tokens_to_spans(self, input_list: list):
+    def __add_tokens_to_spans(self, spans: list):
+        """
+        Функция добавляет правильные токены именованным сущностям.
+        """
         i, j = 0, 0
         token_list = list()
 
-        while i < len(self.doc.tokens) and j < len(input_list):
-            token = self.doc.tokens[i]
-            cur_obj = input_list[j]
-            if len(token_list) > 0 and cur_obj.tokens[-1].text in token.text:
+        while i < len(self.doc.tokens) and j < len(spans):
+            token, span = self.doc.tokens[i], spans[j]
+
+            if token.text in [span_token.text for span_token in span.tokens]:
                 token_list.append(token)
-                cur_obj.tokens = token_list.copy()
-                cur_obj.start = token_list[0].start
-                cur_obj.stop = token_list[-1].stop
+            elif len(token_list) > 0:
+                span.tokens = token_list.copy()
+                span.start = span.tokens[0].start
+                span.stop = span.tokens[-1].stop
                 token_list.clear()
-                i += 1
                 j += 1
-            elif len(token_list) > 0 and (len(token_list) < len(cur_obj.tokens) and cur_obj.tokens[len(token_list)].text in token.text):
-                token_list.append(token)
-                i += 1
-            elif cur_obj.tokens[0].text in token.text and cur_obj.tokens[-1].text in token.text:
-                cur_obj.tokens = [token]
-                cur_obj.start = token.start
-                cur_obj.stop = token.stop
-                i += 1
-                j += 1
-            elif cur_obj.tokens[0].text in token.text:
-                token_list.append(token)
-                i += 1
-            else:
-                i += 1
-        return input_list
+                continue
+            i += 1
+
+        if len(token_list) > 0:
+            spans[j].tokens = token_list
+            spans[j].start = spans[j].tokens[0].start
+            spans[j].stop = spans[j].tokens[-1].stop
+
+        return spans
 
 
 class MainInfo(Section):
-    pass
+    def __init__(self, text: str):
+        super().__init__(text)
 
+        self.name = None
+        self.phone_number = None
+        self.position = None
+
+    def get_info(self):
+        result = [self.name, self.phone_number, self.position]
+        return result
+
+    def __get_name(self):
+        for span in self.spans:
+            if span.type == PER:
+                return span
+
+    def __get_phone_number(self, text: str):
+        phone_pattern = re.compile(
+            r"((\+7|8)[\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2})")
+        return phone_pattern.search(text).group(1)
 
 class Skills(Section):
     pass

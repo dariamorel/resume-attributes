@@ -55,7 +55,7 @@ def main():
     # all_text = ""
     # for page in pdf_doc:
     #     all_text += page.get_text()
-    #
+
     # text = all_text.replace("\n", ", ").replace(".", ",")
     # print(text)
 

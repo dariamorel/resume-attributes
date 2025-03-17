@@ -109,6 +109,14 @@ class Date:
         self.__text = None
 
     @property
+    def start_i(self):
+        return self.tokens[0].i
+
+    @property
+    def stop_i(self):
+        return self.tokens[-1].i
+
+    @property
     def text(self):
         if self.__text:
             return self.__text

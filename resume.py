@@ -1,36 +1,6 @@
-from natasha import (
-    Segmenter,
-    MorphVocab,
-
-    NewsEmbedding,
-    NewsMorphTagger,
-    NewsSyntaxParser,
-    NewsNERTagger,
-
-    PER,
-    NamesExtractor,
-    DatesExtractor,
-
-    Doc
-)
-from natasha import (Segmenter, Doc)
-
 from organizations import Organizations
 from section import MainInfo, Skills
-from document import Document
 import re
-import time
-
-segmenter = Segmenter()
-morph_vocab = MorphVocab()
-
-emb = NewsEmbedding()
-morph_tagger = NewsMorphTagger(emb)
-syntax_parser = NewsSyntaxParser(emb)
-ner_tagger = NewsNERTagger(emb)
-
-names_extractor = NamesExtractor(morph_vocab)
-dates_extractor = DatesExtractor(morph_vocab)
 
 sections_dict = {
     "main_info": [],
@@ -38,7 +8,6 @@ sections_dict = {
     "education": ["Образование", "Education"],
     "skills": ["Навыки", "навыки", "Skills"]
 }
-
 
 class Resume:
     def __init__(self, text: str):
@@ -61,12 +30,10 @@ class Resume:
     def get_skills(self) -> Skills:
         return self.__skills
 
-        # private:
-
     def __divide_to_sections(self, text: str):
         """    
         Функция выделяет секцию из исходного текста.  
-        :param text: исходный текст        """
+        """
         pattern = '|'.join(
             ['|'.join(names) for key, names in sections_dict.items() if key != "main_info"])
 
