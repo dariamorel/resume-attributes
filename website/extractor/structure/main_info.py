@@ -2,13 +2,18 @@ import re
 
 from natasha import PER
 
-from ent import Ent
-from section import Section
+from .ent import Ent
+from .section import Section
 
 
 class MainInfo(Section):
     def __init__(self, text: str):
         super().__init__(text)
+        self.name = None
+        self.phone_number = None
+        self.email = None
+        self.website = None
+        self.position = None
 
         name = self.__get_name()
         if name:
@@ -61,7 +66,7 @@ class MainInfo(Section):
 
         # Ищем по ключевым словам
         for i, token in enumerate(self.doc.tokens):
-            if token.text.lower() in ["должность", "position", "позиция"]:
+            if token.text.lower() in ["должность", "position", "позиция", "специализация"]:
                 # Ищем первое существительное
                 j = i + 1
                 while self.doc.tokens[j].pos != "NOUN":

@@ -1,10 +1,8 @@
-from document import Document, Date
+from .document import Document, Date
 import re
-import time
-from datetime import datetime
 import locale
 
-from ent import Ent
+from .ent import Ent
 
 locale.setlocale(locale.LC_TIME, "ru_RU.UTF-8")
 
@@ -17,8 +15,6 @@ from natasha import (
     NewsSyntaxParser,
     NewsNERTagger,
 
-    PER, ORG, LOC,
-    NamesExtractor,
     DatesExtractor,
 
     Doc

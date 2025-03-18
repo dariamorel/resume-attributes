@@ -1,11 +1,11 @@
-from organizations import Organizations
-from section import Skills
-from main_info import MainInfo
+from .organizations import Organizations
+from .section import Skills
+from .main_info import MainInfo
 import re
 
 sections_dict = {
     "main_info": [],
-    "work_experience": ["Опыт работы", "Опыт", "Experience", "Work experience"],
+    "work_experience": ["Опыт работы", "Опыт", "Experience", "Work experience", "Место работы"],
     "education": ["Образование", "Education"],
     "skills": ["Навыки", "навыки", "Skills"]
 }
