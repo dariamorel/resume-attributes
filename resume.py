@@ -1,5 +1,6 @@
 from organizations import Organizations
-from section import MainInfo, Skills
+from section import Skills
+from main_info import MainInfo
 import re
 
 sections_dict = {
