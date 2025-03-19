@@ -1,0 +1,21 @@
+body {
+    background-image: url('/static/img/ofice.webp');
+    background-size: cover;  /* Растягивает изображение на весь экран */
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);  /* Черный цвет с 50% прозрачностью */
+    z-index: -1;
+}
+
+h1 {
+    color: white;
+}

@@ -8,14 +8,6 @@ import PyPDF2
 
 def show_home_page(request):
 	if request.method == 'POST':
-		# form = PDFFileForm(request.POST, request.FILES)
-		# if form.is_valid():
-		# 	pdf_file = request.FILES['file']
-		# 	pdf_reader = PyPDF2.PdfReader(pdf_file)
-		# 	text = ""
-		# 	for page in pdf_reader.pages:
-		# 		text += page.extract_text()
-
 		uploaded_file = request.FILES['file']
 		file_path = f'media/{uploaded_file.name}'
 		# сохранение файла
