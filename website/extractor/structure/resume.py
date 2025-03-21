@@ -1,14 +1,20 @@
-from .organizations import Organizations
-from .section import Skills
-from .main_info import MainInfo
+from organizations import Organizations
+from section import Skills
+from  main_info import MainInfo
 import re
+import time
 
 sections_dict = {
-    "main_info": [],
-    "work_experience": ["Опыт работы", "Опыт", "Experience", "Work experience", "Место работы"],
-    "education": ["Образование", "Education"],
-    "skills": ["Навыки", "навыки", "Skills"]
+    "work_experience": ["опыт работы", "experience", "work experience", "место работы"],
+    "education": ["высшее образование", "образование высшее", "образование", "education"],
+    "skills": ["ключевые навыки", "навыки", "skills"]
 }
+
+def clean_text(text: str):
+    # Убираем лишние переносы строки
+    text = re.sub(r'(\w)-(\W)', r'\1\2', text)
+
+    return text
 
 class Resume:
     def __init__(self, text: str):
@@ -17,6 +23,7 @@ class Resume:
         self.__education = None
         self.__skills = None
 
+        text = clean_text(text)
         self.__divide_to_sections(text)
 
     def get_main_info(self) -> MainInfo:
@@ -33,26 +40,45 @@ class Resume:
 
     def __divide_to_sections(self, text: str):
         """    
-        Функция выделяет секцию из исходного текста.  
+        Функция выделяет секцию из исходного текста.
         """
+        sections = [["main_info", text]]
+        used_sections = []
+
+        while self.__determine_section(sections, used_sections):
+            self.__determine_section(sections, used_sections)
+
+        for section in sections:
+            if section[0] == "main_info":
+                self.__main_info = section[-1].strip()
+            elif section[0] == "work_experience":
+                self.__work_experience = Organizations(section[-1].strip())
+            elif section[0] == "education":
+                self.__education = section[-1].strip()
+            elif section[0] == "skills":
+                self.__skills = section[-1].strip()
+
+    def __determine_section(self, sections: list, used_sections: list):
         pattern = '|'.join(
-            ['|'.join(names) for key, names in sections_dict.items() if key != "main_info"])
+            ['|'.join(names) for key, names in sections_dict.items() if key not in used_sections])
 
-        sections = re.search(rf'(.*?)({pattern})(.*?)({pattern})(.*?)({pattern})(.*)', text,
+        groups = re.search(rf'(.*?)({pattern})(.*)', sections[-1][-1],
                              re.DOTALL | re.IGNORECASE)
+        if groups:
+            # Определяем, какую секцию нашли
+            group_name = None
+            if groups.group(2).lower() in sections_dict["work_experience"]:
+                group_name = "work_experience"
+            elif groups.group(2).lower() in sections_dict["education"]:
+                group_name = "education"
+            elif groups.group(2).lower() in sections_dict["skills"]:
+                group_name = "skills"
 
-        main_info = sections.group(1)
-        work_experience, education, skills = None, None, None
+            if not group_name:
+                return False
+            sections[-1][-1] = groups.group(1)
+            sections.append([group_name, groups.group(3)])
+            used_sections.append(group_name)
 
-        for i in range(2, 7, 2):
-            if sections.group(i) in sections_dict["work_experience"]:
-                work_experience = sections.group(i + 1)
-            elif sections.group(i) in sections_dict["education"]:
-                education = sections.group(i + 1)
-            elif sections.group(i) in sections_dict["skills"]:
-                skills = sections.group(i + 1)
-
-        self.__main_info = MainInfo(main_info)
-        self.__work_experience = Organizations(work_experience)
-        self.__education = Organizations(education)
-        self.__skills = Skills(skills)
+            return True
+        return False

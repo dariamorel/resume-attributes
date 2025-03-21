@@ -2,8 +2,8 @@ import re
 
 from natasha import PER
 
-from .ent import Ent
-from .section import Section
+from ent import Ent
+from section import Section
 
 
 class MainInfo(Section):

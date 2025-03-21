@@ -1,6 +1,6 @@
-from .document import Date
-from .ent import Ent
-from .section import Section
+from document import Date
+from ent import Ent
+from section import Section
 from natasha import DatesExtractor, MorphVocab
 from natasha.extractors import Match
 from natasha import obj

@@ -1,8 +1,8 @@
-from .document import Document, Date
+from document import Document, Date
 import re
 import locale
 
-from .ent import Ent
+from ent import Ent
 
 locale.setlocale(locale.LC_TIME, "ru_RU.UTF-8")
 
@@ -31,7 +31,7 @@ dates_extractor = DatesExtractor(morph_vocab)
 class Section:
     def __init__(self, text: str):
         # поиск именованных сущностей
-        spans_doc = Doc(text.replace('\n', ", "))
+        spans_doc = Doc(text.replace('\n', ". "))
         spans_doc.segment(segmenter)
         spans_doc.tag_ner(ner_tagger)
         spans_doc = Document(spans_doc)

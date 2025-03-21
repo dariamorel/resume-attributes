@@ -2,7 +2,7 @@ import re
 
 import fitz
 
-from .resume import Resume
+from resume import Resume, clean_text
 from natasha import (
     Segmenter,
     MorphVocab,
@@ -13,7 +13,8 @@ from natasha import (
     NewsNERTagger,
 
     NamesExtractor,
-    DatesExtractor
+    DatesExtractor,
+    Doc
 )
 
 segmenter = Segmenter()
@@ -28,16 +29,14 @@ names_extractor = NamesExtractor(morph_vocab)
 dates_extractor = DatesExtractor(morph_vocab)
 
 
-def clean_text(input_text):
-    cleaned_input = re.sub(r'[.,?!]', '', input_text)
-    return cleaned_input
-
-
 def main():
     # file = open("test.txt", "r")
     # text = file.read()
 
-    pdf_path = "/home/daria/курсач/резюме/test.pdf"
+    resume_names = ['test.pdf', 'Perl-программист.pdf', 'марина_лалала_резюме.pdf', 'Михаил Васильев.pdf',
+                    'Резюме Junior Python Developer.pdf', 'Резюме Юрист.pdf']
+    # for name in resume_names:
+    pdf_path = f"/home/daria/курсач/выборка/{resume_names[1]}"
     pdf_doc = fitz.open(pdf_path)
     all_text = ""
     for page in pdf_doc:
@@ -47,15 +46,15 @@ def main():
     # print(text)
 
     resume = Resume(text)
-    main_info = resume.get_main_info()
-    print(main_info.email.text)
-    # for obj in main_info:
-    #     print(obj.text)
-    # ed = resume.get_main_info()
-    # for obj in ed.get_info():
-    #     if obj:
-    #         print(obj.text)
+    work_experience = resume.get_work_experience()
+    # # for obj in work_experience.get_info():
+    # #     print(obj.text)
+    for span in work_experience.spans:
+        print(span.text)
 
+# def main2(text):
+#     file = open("test.txt", "r")
+#     text = file.read()
 
 if __name__ == "__main__":
     main()

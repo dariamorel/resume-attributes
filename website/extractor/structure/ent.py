@@ -1,4 +1,4 @@
-from .document import Date
+from document import Date
 
 def result_to_str(result):
     formated_result = str()
