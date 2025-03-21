@@ -57,4 +57,10 @@ def main():
 #     text = file.read()
 
 if __name__ == "__main__":
-    main()
+    # main()
+    file = open("test.txt", "r")
+    text = file.read()
+    from dates_parsers import all_dates_extractor
+    matches = all_dates_extractor.findall(text)
+    for match in matches:
+        print(match.fact)
