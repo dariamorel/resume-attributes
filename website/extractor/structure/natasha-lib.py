@@ -52,7 +52,7 @@ def main():
     # print(text)
 
     resume = Resume(text)
-    for obj in resume.work_experience.objects:
+    for obj in resume.education.objects:
         print(obj.text)
     # # print(resume.main_info)
     # print(resume.position)

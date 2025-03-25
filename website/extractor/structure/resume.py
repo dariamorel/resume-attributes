@@ -21,7 +21,7 @@ class Resume:
             self.work_experience = Organizations(work_experience.strip())
         education = self.__find_section(text, "education")
         if education:
-            self.education = education.strip()
+            self.education = Organizations(education.strip())
         self.courses = self.__find_section(text, "courses")
         self.projects = self.__find_section(text, "projects")
         self.achievements = self.__find_section(text, "achievements")

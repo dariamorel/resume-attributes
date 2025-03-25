@@ -76,9 +76,9 @@ class Organizations(Section):
         for date in dates:
             if type(date) == list:
                 texted_pair = f"{date_to_text(date[0].fact)} - {date_to_text(date[-1].fact)}"
-                ents.append(Ent("date", texted_pair, date[0].span.start, date[-1].span.stop))
+                ents.append(Ent("DATE", texted_pair, date[0].span.start, date[-1].span.stop))
                 continue
-            ents.append(Ent("date", date_to_text(date.fact), date.span.start, date.span.stop))
+            ents.append(Ent("DATE", date_to_text(date.fact), date.span.start, date.span.stop))
 
         # Сортируем ents
         self.ents = sorted(ents, key=lambda x: x.start)
@@ -93,11 +93,11 @@ class Organizations(Section):
         orgs = []
         date = None
         for ent in self.ents:
-            if date and ent.type == "date":
+            if date and ent.type == "DATE":
                 objects.append(Object(date, orgs.copy()))
                 date = ent
                 orgs.clear()
-            elif ent.type == "date":
+            elif ent.type == "DATE":
                 date = ent
             else:
                 orgs.append(ent)
@@ -119,10 +119,13 @@ class Organizations(Section):
             else:
                 connected_dates.append(dates[i-1])
                 i += 1
-        start = dates[-2].span.stop
-        stop = dates[-1].span.start
-        if not ((stop - start < 10) and ('-' in text[start:stop] or '—' in text[start:stop])):
-            connected_dates.append(dates[-1])
+        if len(dates) > 1:
+            start = dates[-2].span.stop
+            stop = dates[-1].span.start
+            if not ((stop - start < 10) and ('-' in text[start:stop] or '—' in text[start:stop])):
+                connected_dates.append(dates[-1])
+        if len(dates) == 1:
+            connected_dates.append(dates[0])
 
         # Возвращаем либо список пар, либо список одиночных дат
         if self.connected_dates:
