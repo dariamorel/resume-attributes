@@ -43,7 +43,7 @@ def main():
                     'CV Ангелина.pdf', 'CV_Chizhik_jan2025.pdf', 'CV Shitikova.pdf', 'Громов резюме (1).pdf',
                     'Резюме_Аракелян_Адриана_Артуровна_Юрист_помощник_юриста.pdf']
     # for name in resume_names:
-    pdf_path = f"/home/daria/курсач/выборка/{resume_names[1]}"
+    pdf_path = f"/home/daria/курсач/выборка/{resume_names[3]}"
     pdf_doc = fitz.open(pdf_path)
     all_text = ""
     for page in pdf_doc:
@@ -53,7 +53,7 @@ def main():
     # print(text)
 
     resume = Resume(text)
-    print(resume.position.position)
+    print(resume.languages.languages)
 
     # for obj in resume.skills.objects:
     #     print(obj.text)

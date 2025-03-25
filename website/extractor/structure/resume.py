@@ -1,5 +1,5 @@
 from organizations import Organizations
-from section import Skills, Position
+from section import Skills, Position, Languages
 from  main_info import MainInfo
 import re
 import time
@@ -41,7 +41,7 @@ class Resume:
 
         languages = self.__find_section(text, "languages")
         if languages:
-            self.languages = languages.strip()
+            self.languages = Languages(languages.strip())
 
     def __add_position(self):
         position = []

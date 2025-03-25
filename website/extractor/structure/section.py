@@ -5,7 +5,7 @@ import yake
 
 from ent import Ent
 from ent import Object
-from dictionaries import sections_dict
+from dictionaries import sections_dict, languages_list
 
 locale.setlocale(locale.LC_TIME, "ru_RU.UTF-8")
 
@@ -86,4 +86,25 @@ class Skills(Section):
     def __init__(self, text):
         super().__init__(text)
         text = text.replace(',', ' ')
-        self.objects = text.split()
+        self.skills = text.split()
+
+class Languages(Section):
+    def __init__(self, text):
+        super().__init__(text)
+
+        languages = []
+        for language_name in languages_list:
+            info = self.__find_section(text, language_name)
+            if info:
+                languages.append([language_name, info])
+        self.languages = languages
+
+    def __find_section(self, text, section_name):
+        pattern = '|'.join([f"\s{lang}\s|\s{lang}:" for lang in languages_list if lang != section_name])
+        groups = re.search(rf'({section_name}\s|\s{section_name}:)(.*?)({pattern}|\Z)', text,
+                            re.DOTALL | re.IGNORECASE)
+
+        if groups:
+            return groups.group(2)
+        return None
+
