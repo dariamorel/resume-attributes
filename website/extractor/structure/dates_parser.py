@@ -15,13 +15,3 @@ CUSTOM_DATE = or_(
 ).interpretation(Date)
 
 all_dates_extractor = Parser(CUSTOM_DATE)
-
-def main():
-    text = "2022 - 2023 года и 5 июля 2018"
-
-    matches = all_dates_extractor.findall(text)
-    for match in matches:
-        print(match)
-
-if __name__ == "__main__":
-    main()

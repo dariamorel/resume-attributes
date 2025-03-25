@@ -1,24 +1,29 @@
+from pydantic_core.core_schema import none_schema
+
 from document import Date
 
-def result_to_str(result):
-    formated_result = str()
-    for i, cur_obj in enumerate(result):
-        formated_result += cur_obj.text
-        # текущий объект дата и следующий - дата, связанная с текущей
-        if type(cur_obj) == Date and (i + 1 < len(result) and result[i + 1] == cur_obj.connection):
-            formated_result += ' - '
-        else:
-            formated_result += '\n'
-    return formated_result
-
 class Ent:
-    def __init__(self, input_info):
-        self.text = None
-        self.fact = input_info
-        if type(input_info) == list:
-            self.text = result_to_str(input_info)
-        elif type(input_info) == str:
-            self.text = input_info
-        elif type(input_info):
-            self.text = input_info.text
+    def __init__(self, input_type, input_text, start, stop):
+        self.type = input_type
+        self.text = input_text
+        self.start = start
+        self.stop = stop
+        self.connection = None
+
+class Object:
+    def __init__(self, date, orgs: list):
+        self.date = date
+        self.org = orgs
+
+    @property
+    def text(self):
+        result = f"{self.date.text}\n"
+
+        for el in self.org:
+            result += f"{el.text}\n"
+
+        return result
+
+
+
 
