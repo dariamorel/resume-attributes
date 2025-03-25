@@ -1,7 +1,5 @@
 from pydantic_core.core_schema import none_schema
 
-from document import Date
-
 class Ent:
     def __init__(self, input_type, input_text, start, stop):
         if input_type not in ["DATE", "ORG"]:
@@ -10,7 +8,6 @@ class Ent:
         self.text = input_text
         self.start = start
         self.stop = stop
-        self.connection = None
 
 class Object:
     def __init__(self, date, orgs: list):

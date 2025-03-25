@@ -1,6 +1,5 @@
 from datetime import datetime
 
-from document import Date
 from ent import Ent, Object
 from section import Section
 from natasha import (
@@ -47,18 +46,9 @@ def date_to_text(fact):
 
 class Organizations(Section):
     def __init__(self, text: str):
+        super().__init__(text)
         self.connected_dates = False
         self.objects = None
-
-        spans_text = text.replace('\n', ", ")
-
-        doc = Doc(spans_text)
-        doc.segment(segmenter)
-        doc.parse_syntax(syntax_parser)
-        doc.tag_morph(morph_tagger)
-
-        # Извлекаем именованные сущности
-        doc.tag_ner(ner_tagger)
 
         # Извлекаем даты
         dates_text = text.replace('\n', '  ')
@@ -68,7 +58,7 @@ class Organizations(Section):
         ents = list()
 
         # Добавляем организации в ents
-        for span in doc.spans:
+        for span in self.doc.spans:
             if span.type == ORG or span.type == PER:
                 ents.append(Ent("ORG", span.text, span.start, span.stop))
 

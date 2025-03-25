@@ -1,10 +1,11 @@
 import re
 import time
 import spacy
+import yake
 
 import fitz
 
-from resume import Resume, clean_text
+from resume import Resume
 from natasha import (
     Segmenter,
     MorphVocab,
@@ -52,25 +53,17 @@ def main():
     # print(text)
 
     resume = Resume(text)
-    for obj in resume.education.objects:
-        print(obj.text)
-    # # print(resume.main_info)
-    # print(resume.position)
-    # print(resume.work_experience)
-    # print(resume.education)
-    # print(resume.courses)
-    # print(resume.projects)
-    # print(resume.achievements)
-    # print(resume.skills)
-    # print(resume.languages)
+    print(resume.position.position)
+
+    # for obj in resume.skills.objects:
+    #     print(obj.text)
 
 
 def main2():
-    text = "привет опыт: раз два три проекты навыки"
-    groups = re.findall(rf'(опыт(\s|:))(.*?)(навыки|проекты|\Z)', text,
+    text = "python js языки английский"
+    groups = re.search(rf'(навыки)(.*?)(языки|\Z)', text,
                        re.DOTALL | re.IGNORECASE)
-    section = max((group[2] for group in groups), key=len)
-    print(groups)
+    print(groups.group(2))
 
 if __name__ == "__main__":
     main()

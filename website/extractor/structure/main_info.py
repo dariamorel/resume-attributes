@@ -2,9 +2,28 @@ import re
 
 from natasha import PER
 
-from ent import Ent
+from ent import Ent, Object
 from section import Section
+from natasha import (
+    Segmenter,
+    MorphVocab,
 
+    NewsEmbedding,
+    NewsMorphTagger,
+    NewsSyntaxParser,
+    NewsNERTagger,
+
+    DatesExtractor,
+
+    Doc, ORG, PER, LOC
+)
+segmenter = Segmenter()
+emb = NewsEmbedding()
+morph_tagger = NewsMorphTagger(emb)
+syntax_parser = NewsSyntaxParser(emb)
+ner_tagger = NewsNERTagger(emb)
+morph_vocab = MorphVocab()
+dates_extractor = DatesExtractor(morph_vocab)
 
 class MainInfo(Section):
     def __init__(self, text: str):
@@ -17,37 +36,41 @@ class MainInfo(Section):
 
         name = self.__get_name()
         if name:
-            self.name = Ent(name)
+            self.name = name
 
         phone_number = self.__get_phone_number(text)
         if phone_number:
-            self.phone_number = Ent(phone_number)
+            self.phone_number = phone_number
 
         email = self.__get_email(text)
         if email:
-            self.email = Ent(email)
+            self.email = email
 
         website = self.__get_website(text)
         if website:
-            self.website = Ent(website)
+            self.website = website
 
         position = self.__get_position()
         if position:
-            self.position = Ent(position)
+            self.position = position
 
     def get_info(self):
         result = [self.name, self.phone_number, self.email, self.website, self.position]
         return result
 
     def __get_name(self):
-        for span in self.spans:
+        for span in self.doc.spans:
             if span.type == PER:
-                return span
+                return span.text
+        return None
 
     def __get_phone_number(self, text: str):
         phone_pattern = re.compile(
             r"((\+7|8)[\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2})")
-        return phone_pattern.search(text).group(1)
+        groups = phone_pattern.search(text)
+        if groups:
+            return groups.group(1)
+        return None
 
     def __get_email(self, text: str):
         email_pattern = r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+'
@@ -62,32 +85,7 @@ class MainInfo(Section):
             return result[0]
 
     def __get_position(self):
-        token_to_span = self.token_to_span(self.spans)
-
-        # Ищем по ключевым словам
-        for i, token in enumerate(self.doc.tokens):
-            if token.text.lower() in ["должность", "position", "позиция", "специализация"]:
-                # Ищем первое существительное
-                j = i + 1
-                while self.doc.tokens[j].pos != "NOUN":
-                    j += 1
-                position = self.doc.tokens[j]
-                # Проверяем, является ли сущностью
-                if token_to_span[position.i] != -1:
-                    return self.spans[token_to_span[position.i]]
-                return position
-
-        # Ищем первое существительное в именительном падеже
-        for token in self.doc.tokens:
-            if not (token.pos == "NOUN" and token.feats.get("Case") == "Nom"):
-                continue
-            # является ли именем
-            if token_to_span[token.i] != -1 and self.spans[token_to_span[token.i]] == "PER":
-                continue
-            # является ли номером телефона
-            if token.text in self.phone_number.text:
-                continue
-            # является ли какой-то другой свущностью
-            if token_to_span[token.i] != -1:
-                return self.spans[token_to_span[token.i]]
-            return token
+        for span in self.doc.spans:
+            if span.type != PER and span.type != LOC:
+                return span.text
+        return None
