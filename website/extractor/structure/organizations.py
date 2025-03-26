@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from ent import Ent, Object
 from section import Section
 from natasha import (
@@ -15,9 +14,6 @@ from natasha import (
 
     Doc, ORG, PER
 )
-from natasha.extractors import Match
-from natasha import obj
-
 from dates_parser import all_dates_extractor
 
 segmenter = Segmenter()

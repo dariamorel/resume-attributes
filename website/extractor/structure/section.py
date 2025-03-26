@@ -1,12 +1,6 @@
 import re
 import locale
-
-import yake
-
-from ent import Ent
-from ent import Object
-from dictionaries import sections_dict, languages_list
-
+from dictionaries import languages_list
 locale.setlocale(locale.LC_TIME, "ru_RU.UTF-8")
 
 from natasha import (

@@ -2,7 +2,6 @@ from organizations import Organizations
 from section import Skills, Position, Languages
 from  main_info import MainInfo
 import re
-import time
 import yake
 from dictionaries import sections_dict
 
@@ -42,6 +41,53 @@ class Resume:
         languages = self.__find_section(text, "languages")
         if languages:
             self.languages = Languages(languages.strip())
+
+    def get_name(self):
+        if self.main_info:
+            return self.main_info.name
+        return None
+
+    def get_position(self):
+        if self.position:
+            return self.position.position
+
+    def get_phone_number(self):
+        if self.main_info:
+            return self.main_info.phone_number
+
+    def get_email(self):
+        if self.main_info:
+            return self.main_info.email
+        return None
+
+    def get_website(self):
+        if self.main_info:
+            return self.main_info.website
+        return None
+
+    def get_work_experience(self):
+        if self.work_experience:
+            return [obj.text for obj in self.work_experience.objects]
+        return None
+
+    def get_education(self):
+        if self.education:
+            return [obj.text for obj in self.education.objects]
+        return None
+
+    def get_skills(self):
+        if self.skills:
+            return self.skills.skills
+        return None
+
+    def get_languages(self):
+        result = []
+        if self.languages:
+            for language in self.languages.languages:
+                result.append(f"{language[0]}: {language[-1]}")
+        if len(result) > 0:
+           return result
+        return None
 
     def __add_position(self):
         position = []

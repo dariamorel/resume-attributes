@@ -1,7 +1,4 @@
 import re
-import time
-import spacy
-import yake
 
 import fitz
 
@@ -43,7 +40,7 @@ def main():
                     'CV Ангелина.pdf', 'CV_Chizhik_jan2025.pdf', 'CV Shitikova.pdf', 'Громов резюме (1).pdf',
                     'Резюме_Аракелян_Адриана_Артуровна_Юрист_помощник_юриста.pdf']
     # for name in resume_names:
-    pdf_path = f"/home/daria/курсач/выборка/{resume_names[3]}"
+    pdf_path = f"/home/daria/курсач/выборка/{resume_names[2]}"
     pdf_doc = fitz.open(pdf_path)
     all_text = ""
     for page in pdf_doc:
@@ -53,7 +50,15 @@ def main():
     # print(text)
 
     resume = Resume(text)
-    print(resume.languages.languages)
+    print(resume.get_name())
+    print(resume.get_position())
+    print(resume.get_phone_number())
+    print(resume.get_email())
+    print(resume.get_website())
+    print(resume.get_work_experience())
+    print(resume.get_education())
+    print(resume.get_skills())
+    print(resume.get_languages())
 
     # for obj in resume.skills.objects:
     #     print(obj.text)

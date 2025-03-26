@@ -1,8 +1,4 @@
 import re
-
-from natasha import PER
-
-from ent import Ent, Object
 from section import Section
 from natasha import (
     Segmenter,
@@ -14,8 +10,7 @@ from natasha import (
     NewsNERTagger,
 
     DatesExtractor,
-
-    Doc, ORG, PER, LOC
+    NamesExtractor,
 )
 segmenter = Segmenter()
 emb = NewsEmbedding()
@@ -24,6 +19,17 @@ syntax_parser = NewsSyntaxParser(emb)
 ner_tagger = NewsNERTagger(emb)
 morph_vocab = MorphVocab()
 dates_extractor = DatesExtractor(morph_vocab)
+names_extractor = NamesExtractor(morph_vocab)
+
+def name_to_str(fact):
+    result = ""
+    if fact.last:
+        result += f"{fact.last} "
+    if fact.first:
+        result += f"{fact.first} "
+    if fact.middle:
+        result += f"{fact.middle} "
+    return result
 
 class MainInfo(Section):
     def __init__(self, text: str):
@@ -34,7 +40,7 @@ class MainInfo(Section):
         self.website = None
         self.position = None
 
-        name = self.__get_name()
+        name = self.__get_name(text)
         if name:
             self.name = name
 
@@ -50,18 +56,21 @@ class MainInfo(Section):
         if website:
             self.website = website
 
-        position = self.__get_position()
-        if position:
-            self.position = position
 
-    def get_info(self):
-        result = [self.name, self.phone_number, self.email, self.website, self.position]
-        return result
+    def __get_name(self, text):
+        result = None
 
-    def __get_name(self):
-        for span in self.doc.spans:
-            if span.type == PER:
-                return span.text
+        names = names_extractor(text)
+        for name in names:
+            result = name
+            break
+
+        names_text = re.sub(r'\s+', ' ', text)
+        names = names_extractor(names_text)
+        for name in names:
+            if not result:
+                return name_to_str(name.fact)
+            return max(name_to_str(result.fact), name_to_str(name.fact), key=len)
         return None
 
     def __get_phone_number(self, text: str):
@@ -80,12 +89,14 @@ class MainInfo(Section):
 
     def __get_website(self, text: str):
         link_pattern = r'https?://\S+|www\.\S+'
-        result = re.findall(link_pattern, text)
+        result = re.findall(link_pattern, text, re.IGNORECASE)
         if len(result) > 0:
-            return result[0]
+            return result[0].strip()
 
-    def __get_position(self):
-        for span in self.doc.spans:
-            if span.type != PER and span.type != LOC:
-                return span.text
+        link_pattern = r'\b[a-zA-Z0-9-/]+\.[a-zA-Z0-9/]+'
+        result = re.findall(link_pattern, text, re.IGNORECASE)
+        for res in result:
+            # Проверяем,чтобы не являлся частью email
+            if res.strip() not in self.email:
+                return res.strip()
         return None
