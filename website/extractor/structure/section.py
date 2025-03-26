@@ -1,5 +1,6 @@
 import re
 import locale
+from .ent import Pair
 from .dictionaries import languages_list
 locale.setlocale(locale.LC_TIME, "ru_RU.UTF-8")
 
@@ -39,6 +40,16 @@ class Section:
         doc.tag_ner(ner_tagger)
 
         self.doc = doc
+
+    def lemmatize(self, text):
+        # Убираем лишние спецсимволы и пробелы в начале
+        text = text.strip()
+        if len(text) > 0 and not (text[0].isalpha() or text[0].isdigit()):
+            text = text[1:].strip()
+
+        # Переводим текст в нижний регистр
+        text = text
+        return text
 
 
 class Position(Section):
@@ -90,7 +101,8 @@ class Languages(Section):
         for language_name in languages_list:
             info = self.__find_section(text, language_name)
             if info:
-                languages.append([language_name, info])
+                info = self.lemmatize(info)
+                languages.append(Pair(language_name, info))
         self.languages = languages
 
     def __find_section(self, text, section_name):

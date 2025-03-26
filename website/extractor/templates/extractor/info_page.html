@@ -90,7 +90,8 @@
                         <h4 >Знание языков:</h4>
                         <ul>
                             {% for obj in languages %}
-                            <pre style="font-size: 18px;">{{ obj }}</pre>
+                            <b style="font-size: 18px;">{{ obj.name }}:</b>
+                            <pre style="font-size: 18px;">{{ obj.info }}</pre>
                             {% endfor %}
                         </ul>
                     </div>

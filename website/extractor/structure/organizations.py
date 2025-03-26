@@ -1,6 +1,7 @@
 from datetime import datetime
 from .ent import Ent, Object
 from .section import Section
+from .dates_parser import all_dates_extractor
 from natasha import (
     Segmenter,
     MorphVocab,
@@ -14,7 +15,6 @@ from natasha import (
 
     Doc, ORG, PER
 )
-from .dates_parser import all_dates_extractor
 
 segmenter = Segmenter()
 emb = NewsEmbedding()

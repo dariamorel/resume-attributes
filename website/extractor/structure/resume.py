@@ -81,12 +81,8 @@ class Resume:
         return None
 
     def get_languages(self):
-        result = []
         if self.languages:
-            for language in self.languages.languages:
-                result.append(f"{language[0]}: {language[-1]}")
-        if len(result) > 0:
-           return result
+            return self.languages.languages
         return None
 
     def __add_position(self):
