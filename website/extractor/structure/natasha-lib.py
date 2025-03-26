@@ -2,7 +2,7 @@ import re
 
 import fitz
 
-from resume import Resume
+from .resume import Resume
 from natasha import (
     Segmenter,
     MorphVocab,

@@ -14,7 +14,7 @@ class Object:
 
     @property
     def text(self):
-        result = f"{self.date.text}\n"
+        result = ""
 
         for el in self.org:
             result += f"{el.text}\n"

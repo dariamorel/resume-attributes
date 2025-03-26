@@ -1,3 +1,32 @@
+/* body {
+    background-color: #d1d7f0;
+} */
+
 body {
-    background-color: #bfd0c6;
+    background-image: url('/static/img/trees.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: -1;
+}
+
+/* Для неактивной вкладки */
+.nav-tabs .nav-link {
+    color: #fff;
+}
+
+/* Для активной вкладки */
+.nav-tabs .nav-link.active {
+    color: #000 !important;
+    font-weight: 500;
 }

@@ -1,5 +1,5 @@
 import re
-from section import Section
+from .section import Section
 from natasha import (
     Segmenter,
     MorphVocab,

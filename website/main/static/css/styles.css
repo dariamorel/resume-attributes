@@ -1,6 +1,6 @@
 body {
-    background-image: url('/static/img/ofice.webp');
-    background-size: cover;  /* Растягивает изображение на весь экран */
+    background-image: url('/static/img/trees.jpg');
+    background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
@@ -12,9 +12,14 @@ body::before {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);  /* Черный цвет с 50% прозрачностью */
+    background-color: rgba(0, 0, 0, 0.5);
     z-index: -1;
 }
+
+/* body {
+    background-color: #d1d7f0;
+} */
+
 
 h1 {
     color: white;

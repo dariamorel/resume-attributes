@@ -1,9 +1,9 @@
-from organizations import Organizations
-from section import Skills, Position, Languages
-from  main_info import MainInfo
+from .organizations import Organizations
+from .section import Skills, Position, Languages
+from .main_info import MainInfo
 import re
 import yake
-from dictionaries import sections_dict
+from .dictionaries import sections_dict
 
 class Resume:
     def __init__(self, text: str):
@@ -67,12 +67,12 @@ class Resume:
 
     def get_work_experience(self):
         if self.work_experience:
-            return [obj.text for obj in self.work_experience.objects]
+            return self.work_experience.objects
         return None
 
     def get_education(self):
         if self.education:
-            return [obj.text for obj in self.education.objects]
+            return self.education.objects
         return None
 
     def get_skills(self):
