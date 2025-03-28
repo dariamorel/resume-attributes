@@ -50,9 +50,9 @@ def main():
     # print(text)
 
     resume = Resume(text)
-    for obj in resume.get_work_experience():
-        print(obj.date.text)
-        print(obj.text)
+    # for obj in resume.get_work_experience():
+    #     print(obj.date.text)
+    #     print(obj.text)
 
     # for obj in resume.skills.objects:
     #     print(obj.text)

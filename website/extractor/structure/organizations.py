@@ -25,6 +25,8 @@ morph_vocab = MorphVocab()
 dates_extractor = DatesExtractor(morph_vocab)
 
 def date_to_text(fact):
+    if fact.year == "now":
+        return "настоящее время"
     months = {
         1: "январь", 2: "февраль", 3: "март", 4: "апрель",
         5: "май", 6: "июнь", 7: "июль", 8: "август",
@@ -45,6 +47,7 @@ class Organizations(Section):
         super().__init__(text)
         self.connected_dates = False
         self.objects = None
+        self.connections_type = None
 
         # Извлекаем даты
         dates_text = text.replace('\n', '  ')
@@ -69,11 +72,25 @@ class Organizations(Section):
         # Сортируем ents
         self.ents = sorted(ents, key=lambda x: x.start)
 
+        # Определяем тип связей между DATE и ORGs
+        # self.__define_connections_type()
+        # print(self.connections_type)
+
         # Объединяем ents в объекты Object
         self.objects = self.__set_objects()
 
     def __define_connections_type(self):
-        pass
+        for ent in self.ents:
+            print(ent.text)
+        if self.ents[-1].type == "DATE":
+            self.connections_type = -1
+            return
+
+        i = 0
+        while self.ents[i].type != "DATE":
+            i += 1
+        self.connections_type = i
+
 
     def __set_objects(self):
         # Делим ents на объекты date + ORGs
@@ -82,11 +99,10 @@ class Organizations(Section):
         orgs = []
         date = None
         for ent in self.ents:
-            if date and ent.type == "DATE":
-                objects.append(Object(date, orgs.copy()))
-                date = ent
-                orgs.clear()
-            elif ent.type == "DATE":
+            if ent.type == "DATE":
+                if date:
+                    objects.append(Object(date, orgs.copy()))
+                    orgs.clear()
                 date = ent
             else:
                 orgs.append(ent)
