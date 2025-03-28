@@ -1,7 +1,7 @@
 import re
 import locale
-from ent import Pair
-from dictionaries import languages_list
+from .ent import Pair
+from .dictionaries import languages_list
 locale.setlocale(locale.LC_TIME, "ru_RU.UTF-8")
 
 from natasha import (
@@ -56,10 +56,20 @@ class Position(Section):
     def __init__(self, text, position=None):
         self.position = None
         if not position:
-            super().__init__(text)
-            self.position = self.__get_position(text)
+            position = self.__get_position(text)
+            super().__init__(position)
+            position_array = []
+            for sent in self.doc.sents:
+                position_array.append(self.__normalize_sent(sent))
+            self.position = position_array
         else:
             self.position = position
+
+    def __normalize_sent(self, sent):
+        string = sent.text
+        while not string[0].isalpha():
+            string = string[1:]
+        return string
 
     def __get_position(self, text):
         position, specialization = None, None
@@ -81,17 +91,23 @@ class Position(Section):
             specialization = specific_groups.group(2).strip()
 
         if position and specialization:
-            return [position, specialization]
+            return position + '\n' + specialization
         if position:
-            return [position]
-        return [text]
+            return position
+        return text
 
 
 class Skills(Section):
     def __init__(self, text):
         super().__init__(text)
-        text = text.replace(',', ' ')
-        self.skills = text.split()
+        self.skills = None
+        # Если слова разделены несколькими пробелами
+        if "  " in text:
+            text = text.replace(',', ' ').replace('.', ' ').replace(';', ' ')
+            self.skills = [skill.strip() for skill in text.split()]
+        else:
+            text = text.replace('\n', ', ').replace('.', ' ').replace(';', ' ')
+            self.skills = [skill.strip() for skill in text.split(',')]
 
 class Languages(Section):
     def __init__(self, text):

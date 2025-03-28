@@ -1,9 +1,9 @@
-from organizations import Organizations
-from section import Skills, Position, Languages
-from main_info import MainInfo
+from .organizations import Organizations
+from .section import Skills, Position, Languages
+from .main_info import MainInfo
 import re
 import yake
-from dictionaries import sections_dict
+from .dictionaries import sections_dict
 
 class Resume:
     def __init__(self, text: str):
