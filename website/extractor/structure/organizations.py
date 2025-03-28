@@ -59,29 +59,27 @@ class Organizations(Section):
         # Добавляем организации в ents
         for span in self.doc.spans:
             if span.type == ORG or span.type == PER:
-                ents.append(Ent("ORG", span.text, span.start, span.stop))
+                ents.append(Ent("ORG", span.text, span.start, span.stop, span.tokens))
 
         # Добавляем даты в ents
         for date in dates:
             if type(date) == list:
                 texted_pair = f"{date_to_text(date[0].fact)} - {date_to_text(date[-1].fact)}"
-                ents.append(Ent("DATE", texted_pair, date[0].span.start, date[-1].span.stop))
+                ents.append(Ent("DATE", texted_pair, date[0].span.start, date[-1].span.stop, date[0].tokens + date[-1].tokens))
                 continue
-            ents.append(Ent("DATE", date_to_text(date.fact), date.span.start, date.span.stop))
+            ents.append(Ent("DATE", date_to_text(date.fact), date.span.start, date.span.stop, date.tokens))
 
         # Сортируем ents
         self.ents = sorted(ents, key=lambda x: x.start)
 
         # Определяем тип связей между DATE и ORGs
-        # self.__define_connections_type()
-        # print(self.connections_type)
+        self.__define_connections_type()
 
         # Объединяем ents в объекты Object
         self.objects = self.__set_objects()
 
+
     def __define_connections_type(self):
-        for ent in self.ents:
-            print(ent.text)
         if self.ents[-1].type == "DATE":
             self.connections_type = -1
             return
@@ -98,15 +96,35 @@ class Organizations(Section):
 
         orgs = []
         date = None
-        for ent in self.ents:
-            if ent.type == "DATE":
-                if date:
+        j = self.connections_type
+
+        if self.connections_type == -1:
+            for ent in self.ents:
+                if ent.type == "DATE":
+                    if date and len(orgs) > 0:
+                        objects.append(Object(date, orgs.copy()))
+                        orgs.clear()
+                    date = ent
+                else:
+                    orgs.append(ent)
+            if date and len(orgs) > 0:
+                objects.append(Object(date, orgs.copy()))
+            return objects
+
+        for i in range(len(self.ents) - j):
+            if self.ents[i].type == "DATE" and i != i + j:
+                continue
+            if self.ents[i+j].type == "DATE":
+                if date and len(orgs) > 0:
                     objects.append(Object(date, orgs.copy()))
                     orgs.clear()
-                date = ent
-            else:
-                orgs.append(ent)
-        if date:
+                date = self.ents[i+j]
+            if self.ents[i].type != "DATE":
+                orgs.append(self.ents[i])
+
+        for i in range(len(self.ents) - j, len(self.ents)):
+            orgs.append(self.ents[i])
+        if date and len(orgs) > 0:
             objects.append(Object(date, orgs.copy()))
         return objects
 

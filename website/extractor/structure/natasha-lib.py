@@ -40,7 +40,7 @@ def main():
                     'CV Ангелина.pdf', 'CV_Chizhik_jan2025.pdf', 'CV Shitikova.pdf', 'Громов резюме (1).pdf',
                     'Резюме_Аракелян_Адриана_Артуровна_Юрист_помощник_юриста.pdf']
     # for name in resume_names:
-    pdf_path = f"/home/daria/курсач/выборка/{resume_names[2]}"
+    pdf_path = f"/home/daria/курсач/выборка/{resume_names[13]}"
     pdf_doc = fitz.open(pdf_path)
     all_text = ""
     for page in pdf_doc:
@@ -50,9 +50,16 @@ def main():
     # print(text)
 
     resume = Resume(text)
-    # for obj in resume.get_work_experience():
-    #     print(obj.date.text)
-    #     print(obj.text)
+    print("Опыт работы:\n")
+    if resume.get_work_experience():
+        for obj in resume.get_work_experience():
+            print(obj.date.text)
+            print(obj.text)
+    print("Образование:\n")
+    if resume.get_education():
+        for obj in resume.get_education():
+            print(obj.date.text)
+            print(obj.text)
 
     # for obj in resume.skills.objects:
     #     print(obj.text)
