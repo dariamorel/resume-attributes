@@ -1,7 +1,7 @@
 import re
 import locale
-from .ent import Pair
-from .dictionaries import languages_list
+from ent import Pair
+from dictionaries import languages_list
 locale.setlocale(locale.LC_TIME, "ru_RU.UTF-8")
 
 from natasha import (

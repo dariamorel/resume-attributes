@@ -1,7 +1,7 @@
 from datetime import datetime
-from .ent import Ent, Object
-from .section import Section
-from .dates_parser import all_dates_extractor
+from ent import Ent, Object
+from section import Section
+from dates_parser import all_dates_extractor
 from natasha import (
     Segmenter,
     MorphVocab,
@@ -71,6 +71,9 @@ class Organizations(Section):
 
         # Объединяем ents в объекты Object
         self.objects = self.__set_objects()
+
+    def __define_connections_type(self):
+        pass
 
     def __set_objects(self):
         # Делим ents на объекты date + ORGs

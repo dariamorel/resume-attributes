@@ -1,5 +1,5 @@
 import re
-from .section import Section
+from section import Section
 from natasha import (
     Segmenter,
     MorphVocab,
@@ -10,7 +10,7 @@ from natasha import (
     NewsNERTagger,
 
     DatesExtractor,
-    NamesExtractor,
+    NamesExtractor, Doc, PER
 )
 segmenter = Segmenter()
 emb = NewsEmbedding()
@@ -24,12 +24,16 @@ names_extractor = NamesExtractor(morph_vocab)
 def name_to_str(fact):
     result = ""
     if fact.last:
-        result += f"{fact.last} "
+        last = fact.last[0].upper() + fact.last[1:].lower()
+        result += f"{last} "
     if fact.first:
-        result += f"{fact.first} "
+        first = fact.first[0].upper() + fact.first[1:].lower()
+        result += f"{first} "
     if fact.middle:
-        result += f"{fact.middle} "
+        middle = fact.middle[0].upper() + fact.middle[1:].lower()
+        result += f"{middle} "
     return result
+
 
 class MainInfo(Section):
     def __init__(self, text: str):
