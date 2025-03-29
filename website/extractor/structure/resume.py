@@ -1,8 +1,8 @@
-from organizations import Organizations
-from section import Skills, Languages
-from position import Position
-from main_info import MainInfo
-from dictionaries import sections_dict
+from .organizations import Organizations
+from .section import Skills, Languages
+from .position import Position
+from .main_info import MainInfo
+from .dictionaries import sections_dict
 import re
 import yake
 
@@ -27,7 +27,7 @@ class Resume:
         else:
             position = self.__add_position()
             if len(position) > 0:
-                self.position = Position(None, position)
+                self.position = Position("", position)
 
         work_experience = self.__find_section(text, "work_experience")
         if work_experience:

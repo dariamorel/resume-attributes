@@ -1,7 +1,7 @@
 from datetime import datetime
-from ent import Ent, Object
-from section import Section
-from dates_parser import all_dates_extractor
+from .ent import Ent, Object
+from .section import Section
+from .dates_parser import all_dates_extractor
 from natasha import (
     Segmenter,
     MorphVocab,
@@ -123,7 +123,8 @@ class Organizations(Section):
                 orgs.append(self.ents[i])
 
         for i in range(len(self.ents) - j, len(self.ents)):
-            orgs.append(self.ents[i])
+            if self.ents[i].type == "ORG":
+                orgs.append(self.ents[i])
         if date and len(orgs) > 0:
             objects.append(Object(date, orgs.copy()))
         return objects
@@ -135,7 +136,7 @@ class Organizations(Section):
             # dates[i] и dates[i-1] связаны
             start = dates[i-1].span.stop
             stop = dates[i].span.start
-            if (stop - start < 10) and ('-' in text[start:stop] or '—' in text[start:stop]):
+            if (stop - start < 10) and ('–' in text[start:stop] or '—' in text[start:stop] or '-' in text[start:stop]):
                 connected_dates.append([dates[i-1], dates[i]])
                 self.connected_dates = True
                 i += 2
@@ -145,7 +146,7 @@ class Organizations(Section):
         if len(dates) > 1:
             start = dates[-2].span.stop
             stop = dates[-1].span.start
-            if not ((stop - start < 10) and ('-' in text[start:stop] or '—' in text[start:stop])):
+            if not ((stop - start < 10) and ('-' in text[start:stop] or '—' in text[start:stop] or '–' in text[start:stop])):
                 connected_dates.append(dates[-1])
         if len(dates) == 1:
             connected_dates.append(dates[0])

@@ -1,4 +1,4 @@
-from section import Section, normalize_sent
+from .section import Section, normalize_sent
 import re
 from natasha import Doc, Segmenter
 segmenter = Segmenter()
@@ -6,10 +6,11 @@ segmenter = Segmenter()
 
 class Position(Section):
     def __init__(self, text, position=None):
+        super().__init__(text)
+        text = self.delete_additional_info(text)
         self.position = None
         if not position:
             position = self.__get_position(text)
-            super().__init__(position)
             position = position.replace('.', ',').replace('\n', ', ').replace(';', ',')
             position = position.split(',')
 

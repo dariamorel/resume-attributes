@@ -1,7 +1,7 @@
 import re
 import locale
-from ent import Pair
-from dictionaries import languages_list
+from .ent import Pair
+from .dictionaries import languages_list
 
 locale.setlocale(locale.LC_TIME, "ru_RU.UTF-8")
 
@@ -32,21 +32,19 @@ def normalize_sent(sent):
     if len(sent) == 0:
         return None
     # Убираем спец символы в начале и в конце
-    while not sent[0].isalpha():
+    while not (sent[0].isalpha() and sent[0].isdigit()):
         sent = sent[1:]
         if len(sent) == 0:
             return None
 
-    doc = Doc(sent)
-    doc.segment(segmenter)
-    while not sent[-1].isalpha():
+    while not (sent[-1].isalpha() and sent[-1].isdigit()):
         sent = sent[:-1]
         if len(sent) == 0:
             return None
 
     # Добавляем точку, если длинное предложение
-    if len(doc.tokens) > 3:
-        sent += '.'
+    # if len(doc.tokens) > 3:
+    #     sent += '.'
 
     # Форматируем строчные и заглавные буквы
     sent = sent.lower()
@@ -66,28 +64,52 @@ class Section:
 
         self.doc = doc
 
-    def lemmatize(self, text):
-        # Убираем лишние спецсимволы и пробелы в начале
-        text = text.strip()
-        if len(text) > 0 and not (text[0].isalpha() or text[0].isdigit()):
-            text = text[1:].strip()
+    def lemmatize(self, sent):
+        sent = sent.strip()
+        if len(sent) == 0:
+            return None
+        # Убираем спец символы в начале и в конце
+        while not (sent[0].isalpha() and sent[0].isdigit()):
+            sent = sent[1:]
+            if len(sent) == 0:
+                return None
 
-        # Переводим текст в нижний регистр
-        text = text
-        return text
+        while not (sent[-1].isalpha() and sent[-1].isdigit()):
+            if sent[-1] in [')', ']', '}', '"', "'"]:
+                break
+            sent = sent[:-1]
+            if len(sent) == 0:
+                return None
+
+        return sent[0].upper() + sent[1:]
+
+    def delete_additional_info(self, text):
+        doc = Doc(text)
+        doc.segment(segmenter)
+        start, stop = 0, len(text)
+        normalized_text = ""
+        for token in doc.tokens:
+            if token.text == '(':
+                stop = token.start
+                normalized_text += text[start:stop]
+            if token.text == ')':
+                start = token.stop
+        normalized_text += text[start:]
+        return normalized_text
 
 
 class Skills(Section):
     def __init__(self, text):
         super().__init__(text)
+        text = self.delete_additional_info(text)
         self.skills = None
         # Если слова разделены несколькими пробелами
-        if "  " in text:
+        if "   " in text:
             text = text.replace(',', ' ').replace('.', ' ').replace(';', ' ')
-            self.skills = [normalize_sent(skill) for skill in text.split()]
+            self.skills = [normalize_sent(skill) for skill in text.split() if normalize_sent(skill)]
         else:
-            text = text.replace('\n', ', ').replace('.', ' ').replace(';', ' ')
-            self.skills = [normalize_sent(skill) for skill in text.split(',')]
+            text = text.replace('\n', ' ').replace('.', ',').replace(';', ',')
+            self.skills = [normalize_sent(skill) for skill in text.split(',') if normalize_sent(skill)]
 
 class Languages(Section):
     def __init__(self, text):
