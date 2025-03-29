@@ -43,7 +43,10 @@ class Pair:
         self.name = name
         self.info = info
 
-
+class Name:
+    def __init__(self, fact, text):
+        self.fact = fact
+        self.text = text
 
 
 

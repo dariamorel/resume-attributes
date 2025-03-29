@@ -1,5 +1,6 @@
 import re
-from .section import Section
+from section import Section
+from ent import Name
 from natasha import (
     Segmenter,
     MorphVocab,
@@ -44,9 +45,9 @@ class MainInfo(Section):
         self.website = None
         self.position = None
 
-        name = self.__get_name(text)
-        if name:
-            self.name = name
+        name_fact, name_text = self.__get_name(text)
+        if name_fact:
+            self.name = Name(name_fact, name_text)
 
         phone_number = self.__get_phone_number(text)
         if phone_number:
@@ -73,8 +74,12 @@ class MainInfo(Section):
         names = names_extractor(names_text)
         for name in names:
             if not result:
-                return name_to_str(name.fact)
-            return max(name_to_str(result.fact), name_to_str(name.fact), key=len)
+                return name.fact, name_to_str(name.fact)
+            result_text = name_to_str(result.fact)
+            name_text = name_to_str(name.fact)
+            if len(result_text) > len(name_text):
+                return result.fact, result_text,
+            return name.fact, name_text
         return None
 
     def __get_phone_number(self, text: str):

@@ -1,7 +1,7 @@
 from datetime import datetime
-from .ent import Ent, Object
-from .section import Section
-from .dates_parser import all_dates_extractor
+from ent import Ent, Object
+from section import Section
+from dates_parser import all_dates_extractor
 from natasha import (
     Segmenter,
     MorphVocab,

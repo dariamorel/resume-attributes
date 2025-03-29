@@ -1,9 +1,10 @@
-from .organizations import Organizations
-from .section import Skills, Position, Languages
-from .main_info import MainInfo
+from organizations import Organizations
+from section import Skills, Languages
+from position import Position
+from main_info import MainInfo
+from dictionaries import sections_dict
 import re
 import yake
-from .dictionaries import sections_dict
 
 class Resume:
     def __init__(self, text: str):
@@ -24,7 +25,9 @@ class Resume:
         if position:
             self.position = Position(position.strip())
         else:
-            self.position = Position(None, self.__add_position())
+            position = self.__add_position()
+            if len(position) > 0:
+                self.position = Position(None, position)
 
         work_experience = self.__find_section(text, "work_experience")
         if work_experience:
@@ -44,7 +47,7 @@ class Resume:
 
     def get_name(self):
         if self.main_info:
-            return self.main_info.name
+            return self.main_info.name.text
         return None
 
     def get_position(self):
@@ -87,11 +90,16 @@ class Resume:
 
     def __add_position(self):
         position = []
-        extractor = yake.KeywordExtractor(lan="ru", top=3)
+        extractor = yake.KeywordExtractor(lan="ru", top=10)
         keywords = extractor.extract_keywords(self.text)
         for kw in keywords:
-            if self.main_info.name and self.main_info.name in kw[0]:
-                continue
+            if len(position) >= 3:
+                break
+
+            if self.main_info and self.main_info.name:
+                name = self.main_info.name.fact
+                if any([el in kw[0] for el in [str(name.first), str(name.last), str(name.middle)]]):
+                    continue
             position.append(kw[0])
         return position
 
