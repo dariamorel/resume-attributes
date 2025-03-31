@@ -42,6 +42,7 @@ class Organizations(Section):
         # Сортируем ents
         self.ents = sorted(ents, key=lambda x: x.start)
 
+
         if len(self.ents) == 0:
             return
 

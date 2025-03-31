@@ -57,3 +57,5 @@ def test03():
     first_last()
     first_last_middle()
     with_spaces()
+
+    print("Test 03 passed.")

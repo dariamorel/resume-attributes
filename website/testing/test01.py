@@ -74,3 +74,5 @@ def test01():
     no_section_education()
     no_section_skills()
     no_section_languages()
+
+    print("Test 01 passed.")

@@ -68,3 +68,5 @@ def test02():
         check_skills(resume)
     except Exception as e:
         pytest.fail(f"Test 02 failed with error {type(e).__name__}")
+
+    print("Test 02 passed.")

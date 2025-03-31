@@ -28,17 +28,17 @@ class Skills(Section):
         if "   " in text:
             text = text.replace('\n', '   ').replace(',', '   ').replace(';', '   ')
             return [normalized_skill for skill in text.split("   ") if
-                    (normalized_skill := normalize_sent(skill, True))]
+                    (normalized_skill := normalize_sent(skill))]
         if not any([symb in text for symb in [',', '.', ';']]):
             text = text.replace('\n', ' ')
-            return [normalized_skill for skill in text.split() if (normalized_skill := normalize_sent(skill, True))]
+            return [normalized_skill for skill in text.split() if (normalized_skill := normalize_sent(skill))]
 
         # Case 2. Навыки разделены запятыми
         if ',' in [token.text for token in self.doc.tokens[:5]]:
             text = text.replace('\n', ' ').replace(';', ',')
-            return [normalized_skill for skill in text.split(',') if (normalized_skill := normalize_sent(skill, True))]
+            return [normalized_skill for skill in text.split(',') if (normalized_skill := normalize_sent(skill))]
 
         # Case 3. Навыки имеют структуру предложений
         text = text.replace('\n', ' ')
         return [f"{normalized_skill}." for skill in text.split('.') if
-                (normalized_skill := normalize_sent(skill, True))]
+                (normalized_skill := normalize_sent(skill))]
