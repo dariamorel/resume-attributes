@@ -46,7 +46,6 @@ class MainInfo(Section):
         if website:
             self.website = website
 
-
     def __get_name(self):
         """
         Функция извлекает ФИО из исходного текста.

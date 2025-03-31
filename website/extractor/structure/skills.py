@@ -12,7 +12,7 @@ class Skills(Section):
         specific_groups = re.search(rf'({pattern1})(.*?)({pattern2}|\Z)', text,
                                     re.DOTALL | re.IGNORECASE)
         if specific_groups:
-            text = specific_groups.group(2)
+            text = specific_groups.group(2).strip()
 
         super().__init__(text)
         self.skills = self.__set_skills()

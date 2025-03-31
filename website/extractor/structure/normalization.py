@@ -65,7 +65,7 @@ def name_to_str(fact):
     if fact.middle:
         middle = fact.middle[0].upper() + fact.middle[1:].lower()
         result += f"{middle} "
-    return result
+    return result.strip()
 
 def date_to_str(fact):
     """

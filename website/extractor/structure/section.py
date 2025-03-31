@@ -50,3 +50,6 @@ class Section:
 
         self.doc = doc
 
+    @property
+    def text(self):
+        return self.doc.text

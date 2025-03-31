@@ -42,6 +42,9 @@ class Organizations(Section):
         # Сортируем ents
         self.ents = sorted(ents, key=lambda x: x.start)
 
+        if len(self.ents) == 0:
+            return
+
         # Определяем тип связей между DATE и ORGs
         self.__define_connections_type()
 
