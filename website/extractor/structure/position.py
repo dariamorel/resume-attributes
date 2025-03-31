@@ -1,5 +1,5 @@
-from section import Section
-from normalization import normalize_sent
+from .section import Section
+from .normalization import normalize_sent
 
 import re
 from natasha import Segmenter

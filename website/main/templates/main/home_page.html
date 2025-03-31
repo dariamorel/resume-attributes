@@ -15,10 +15,10 @@
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
-
     <div class="d-flex justify-content-center align-items-center vh-100">
-    <div class="text-center" style="width: 600px;">
-        <h1>Добавить резюме в формате pdf-файла</h1>
+        <div class="text-center" style="width: 800px;">
+            <p style="font-size: 20px; color: white;">Данный сайт предназначен для парсинга резюме формата pdf. При загрузке файла будет произведен анализ содержимого резюме, по результатам которого будет предоставлена выжимка из файла.</p><br>
+            <h1>Добавить pdf-файл</h1><br>
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
 

@@ -33,11 +33,22 @@
                 <button class="nav-link" id="skills-tab" data-bs-toggle="tab"
                         data-bs-target="#skills" type="button" role="tab">Навыки</button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="languages-tab" data-bs-toggle="tab"
+                        data-bs-target="#languages" type="button" role="tab">Языки</button>
+            </li>
         </ul>
 
         <!-- Контент вкладок -->
         <div class="tab-content p-3 bg-light border border-top-0 rounded-bottom" id="myTabContent">
             <div class="tab-pane fade show active" id="main_info" role="tabpanel">
+
+                {% if img_name != "" %}
+                    <div class="image-wrapper" style="width: 200px; height: 200px; overflow: auto;">
+                        <img src="/media/img/{{ img_name }}.png" alt="Изображение" style="width: 100%; height: 100%;">
+                    </div><br>
+                {% endif %}
+
                 <h4 >ФИО</h4>
                 <pre style="font-size: 18px;">{{ name }}</pre><br>
 
@@ -70,32 +81,29 @@
             <div class="tab-pane fade" id="education" role="tabpanel">
                 <ul>
                     {% for obj in education %}
-                    <h5 >{{ obj.date.text }}</h5>
-                    <pre style="font-size: 18px;">{{ obj.text }}</pre>
+                    <h5 >{{ obj.date }}</h5>
+                    <pre style="font-size: 18px;">{{ obj.orgs }}</pre>
                     {% endfor %}
                 </ul>
             </div>
 
             <div class="tab-pane fade" id="skills" role="tabpanel">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h4 >Навыки:</h4>
-                        <ul>
-                            {% for obj in skills %}
-                            <pre style="font-size: 18px;">{{ obj }}</pre>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    <div class="col-md-6">
-                        <h4 >Знание языков:</h4>
-                        <ul>
-                            {% for obj in languages %}
-                            <b style="font-size: 18px;">{{ obj.name }}:</b>
-                            <pre style="font-size: 18px;">{{ obj.info }}</pre>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
+                <h4 >Навыки:</h4>
+                <ul>
+                    {% for obj in skills %}
+                    <pre style="font-size: 18px;">{{ obj }}</pre>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="tab-pane fade" id="languages" role="tabpanel">
+                <h4 >Знание языков:</h4>
+                <ul>
+                    {% for obj in languages %}
+                    <b style="font-size: 18px;">{{ obj.name }}:</b>
+                    <pre style="font-size: 18px;">{{ obj.info }}</pre>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
     </div>

@@ -1,6 +1,6 @@
-from section import Section
-from dictionaries import sections_dict
-from normalization import normalize_sent
+from .section import Section
+from .dictionaries import sections_dict
+from .normalization import normalize_sent
 
 import re
 

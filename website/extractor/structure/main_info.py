@@ -1,6 +1,6 @@
-from section import Section
-from ent import Name
-from normalization import name_to_str, lemmatize_phone_number
+from .section import Section
+from .ent import Name
+from .normalization import name_to_str, lemmatize_phone_number
 
 import re
 from natasha import MorphVocab, NamesExtractor

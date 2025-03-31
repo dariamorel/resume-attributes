@@ -9,7 +9,7 @@ import PyPDF2
 def show_home_page(request):
 	if request.method == 'POST':
 		uploaded_file = request.FILES['file']
-		file_path = f'media/{uploaded_file.name}'
+		file_path = f'media/pdfs/{uploaded_file.name}'
 		# сохранение файла
 		with open(file_path, 'wb+') as destination:
 			for chunk in uploaded_file.chunks():
@@ -17,6 +17,7 @@ def show_home_page(request):
 
 		# сохранение пути к файлу
 		request.session['pdf_path'] = file_path
+		request.session['pdf_name'] = uploaded_file.name
 		return redirect('info_page')
 	else:
 		form = PDFFileForm()

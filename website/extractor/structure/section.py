@@ -1,4 +1,4 @@
-from normalization import delete_additional_info
+from .normalization import delete_additional_info
 
 import locale
 locale.setlocale(locale.LC_TIME, "ru_RU.UTF-8")

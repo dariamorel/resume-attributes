@@ -1,7 +1,7 @@
-from section import Section
-from ent import Lang
-from dictionaries import  languages_list
-from normalization import normalize_sent
+from .section import Section
+from .ent import Lang
+from .dictionaries import  languages_list
+from .normalization import normalize_sent
 
 import re
 

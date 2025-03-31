@@ -16,11 +16,10 @@ body::before {
     z-index: -1;
 }
 
-/* body {
-    background-color: #d1d7f0;
-} */
-
-
 h1 {
+    color: white;
+}
+
+p {
     color: white;
 }

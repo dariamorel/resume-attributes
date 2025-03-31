@@ -1,14 +1,14 @@
-from organizations import Organizations
-from skills import Skills
-from languages import Languages
-from position import Position
-from main_info import MainInfo
-from dictionaries import sections_dict, forbidden_words
+from .organizations import Organizations
+from .skills import Skills
+from .languages import Languages
+from .position import Position
+from .main_info import MainInfo
+from .dictionaries import sections_dict, forbidden_words
 import re
 import yake
 
 class Resume:
-    def __init__(self, text: str):
+    def __init__(self, text):
         text = re.sub(r'(\w)-(\W)', r'\1\2', text)
         self.text = text
         self.main_info = None

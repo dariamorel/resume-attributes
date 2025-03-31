@@ -1,7 +1,7 @@
-from ent import Ent, Object
-from section import Section
-from normalization import date_to_str
-from dates_parser import all_dates_extractor
+from .ent import Ent, Object
+from .section import Section
+from .normalization import date_to_str
+from .dates_parser import all_dates_extractor
 
 from natasha import MorphVocab, DatesExtractor, ORG, PER
 
@@ -28,7 +28,7 @@ class Organizations(Section):
 
         # Добавляем организации в ents
         for span in self.spans:
-            if span.type == ORG or span.type == PER:
+            if span.type == ORG:
                 ents.append(Ent("ORG", span.text, span.start, span.stop, span.tokens))
 
         # Добавляем даты в ents
