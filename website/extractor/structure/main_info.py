@@ -80,7 +80,7 @@ class MainInfo(Section):
             if len(result_text) > len(name_text):
                 return result.fact, result_text,
             return name.fact, name_text
-        return None
+        return None, None
 
     def __get_phone_number(self, text: str):
         phone_pattern = re.compile(

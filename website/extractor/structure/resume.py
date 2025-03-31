@@ -2,7 +2,7 @@ from .organizations import Organizations
 from .section import Skills, Languages
 from .position import Position
 from .main_info import MainInfo
-from .dictionaries import sections_dict
+from .dictionaries import sections_dict, forbidden_words
 import re
 import yake
 
@@ -30,10 +30,14 @@ class Resume:
                 self.position = Position("", position)
 
         work_experience = self.__find_section(text, "work_experience")
+        print("ОПЫТ РАБОТЫ")
+        print(work_experience)
         if work_experience:
             self.work_experience = Organizations(work_experience.strip())
 
         education = self.__find_section(text, "education")
+        print("ОБРАЗОВАНИЕ")
+        print(education)
         if education:
             self.education = Organizations(education.strip())
 
@@ -46,7 +50,7 @@ class Resume:
             self.languages = Languages(languages.strip())
 
     def get_name(self):
-        if self.main_info:
+        if self.main_info and self.main_info.name:
             return self.main_info.name.text
         return None
 
@@ -114,10 +118,16 @@ class Resume:
             return None
 
         pattern1 = '|'.join([f"\s{name}\s|\s{name}:" for name in sections_dict[section_name]])
-        pattern2 = '|'.join(
-            ['|'.join([f"\s{name}\s|\s{name}:" for name in names]) for key, names in sections_dict.items() if key != section_name])
+        if section_name in ["work_experience", "education"]:
+            pattern2 = '|'.join(
+                ['|'.join([f"\s{name}\s|\s{name}:" for name in names if name not in forbidden_words]) for key, names in sections_dict.items() if
+                 key != section_name])
+        else:
+            pattern2 = '|'.join(
+                ['|'.join([f"\s{name}\s|\s{name}:" for name in names]) for key, names in sections_dict.items() if
+                 key != section_name])
         groups = re.search(rf'({pattern1})(.*?)({pattern2}|\Z)', text,
-                            re.DOTALL | re.IGNORECASE)
+                           re.DOTALL | re.IGNORECASE)
 
         # Смотрим специфичные ситуации для секции навыков
         if section_name == "skills" and groups:

@@ -87,6 +87,8 @@ class Organizations(Section):
         i = 0
         while self.ents[i].type != "DATE":
             i += 1
+            if i >= len(self.ents):
+                break
         self.connections_type = i
 
 

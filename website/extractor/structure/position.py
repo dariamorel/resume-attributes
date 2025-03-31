@@ -1,4 +1,5 @@
-from .section import Section, normalize_sent
+from .section import Section
+from .normalization import delete_additional_info, normalize_sent
 import re
 from natasha import Doc, Segmenter
 segmenter = Segmenter()
@@ -7,7 +8,7 @@ segmenter = Segmenter()
 class Position(Section):
     def __init__(self, text, position=None):
         super().__init__(text)
-        text = self.delete_additional_info(text)
+        text = delete_additional_info(text)
         self.position = None
         if not position:
             position = self.__get_position(text)
@@ -19,9 +20,9 @@ class Position(Section):
             # Берем максимум 10 позиций
             if len(position_array) >= 5:
                 break
-            normalized_sent = normalize_sent(sent)
+            normalized_sent = normalize_sent(sent, True)
             if normalized_sent:
-                position_array.append(normalized_sent)
+                position_array.append(f"{normalized_sent}.")
         self.position = position_array
 
     def __get_position(self, text):
