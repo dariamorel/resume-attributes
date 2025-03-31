@@ -2,7 +2,7 @@ import re
 
 import fitz
 
-from .resume import Resume
+from resume import Resume
 from natasha import (
     Segmenter,
     MorphVocab,
@@ -50,29 +50,8 @@ def main():
     # print(text)
 
     resume = Resume(text)
-    # for obj in resume.get_education():
-    #     print(obj.date.text)
-    #     print(obj.text)
-    # print("Опыт работы:\n")
-    # if resume.get_work_experience():
-    #     for obj in resume.get_work_experience():
-    #         print(obj.date.text)
-    #         print(obj.text)
-    # print("Образование:\n")
-    # if resume.get_education():
-    #     for obj in resume.get_education():
-    #         print(obj.date.text)
-    #         print(obj.text)
+    print(resume.get_skills())
 
-    # for obj in resume.skills.objects:
-    #     print(obj.text)
-
-
-def main2():
-    text = "python js языки английский"
-    groups = re.search(rf'(навыки)(.*?)(языки|\Z)', text,
-                       re.DOTALL | re.IGNORECASE)
-    print(groups.group(2))
 
 if __name__ == "__main__":
     main()

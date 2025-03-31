@@ -61,8 +61,8 @@
             <div class="tab-pane fade" id="work_experience" role="tabpanel">
                 <ul>
                     {% for obj in work_experience %}
-                    <h5 >{{ obj.date.text }}</h5>
-                    <pre style="font-size: 18px;">{{ obj.text }}</pre>
+                    <h5 >{{ obj.date }}</h5>
+                    <pre style="font-size: 18px;">{{ obj.orgs }}</pre>
                     {% endfor %}
                 </ul>
             </div>

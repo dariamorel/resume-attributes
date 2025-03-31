@@ -1,8 +1,9 @@
-from .organizations import Organizations
-from .section import Skills, Languages
-from .position import Position
-from .main_info import MainInfo
-from .dictionaries import sections_dict, forbidden_words
+from organizations import Organizations
+from skills import Skills
+from languages import Languages
+from position import Position
+from main_info import MainInfo
+from dictionaries import sections_dict, forbidden_words
 import re
 import yake
 
@@ -17,35 +18,33 @@ class Resume:
         self.skills = None
         self.languages = None
 
-        main_info = self.__find_section(text, "main_info")
+        main_info = self.__find_section("main_info")
         if main_info:
             self.main_info = MainInfo(main_info)
 
-        position = self.__find_section(text, "position")
+        position = self.__find_section("position")
+        # Если есть секция с должностью
         if position:
             self.position = Position(position.strip())
+        # Если нет, то берем должность из списка ключевых слов.
         else:
             position = self.__add_position()
             if len(position) > 0:
                 self.position = Position("", position)
 
-        work_experience = self.__find_section(text, "work_experience")
-        print("ОПЫТ РАБОТЫ")
-        print(work_experience)
+        work_experience = self.__find_section("work_experience")
         if work_experience:
             self.work_experience = Organizations(work_experience.strip())
 
-        education = self.__find_section(text, "education")
-        print("ОБРАЗОВАНИЕ")
-        print(education)
+        education = self.__find_section("education")
         if education:
             self.education = Organizations(education.strip())
 
-        skills = self.__find_section(text, "skills")
+        skills = self.__find_section("skills")
         if skills:
             self.skills = Skills(skills.strip())
 
-        languages = self.__find_section(text, "languages")
+        languages = self.__find_section("languages")
         if languages:
             self.languages = Languages(languages.strip())
 
@@ -93,13 +92,20 @@ class Resume:
         return None
 
     def __add_position(self):
+        """
+        Функция составляет список позиций за счет ключевых слов.
+        :return: список ключевых слов, подходящих под секцию должность
+        """
         position = []
+        # Находим топ-10 ключевых слов в тексте
         extractor = yake.KeywordExtractor(lan="ru", top=10)
         keywords = extractor.extract_keywords(self.text)
         for kw in keywords:
+            # Берем не более трех подходящих позиций.
             if len(position) >= 3:
                 break
 
+            # Проверяем, что найденное ключевое слово не часть имени.
             if self.main_info and self.main_info.name:
                 name = self.main_info.name.fact
                 if any([el in kw[0] for el in [str(name.first), str(name.last), str(name.middle)]]):
@@ -107,37 +113,38 @@ class Resume:
             position.append(kw[0])
         return position
 
-    def __find_section(self, text, section_name):
+    def __find_section(self, section_name):
+        """
+        Функция ищет в тексте секцию с названием section_name.
+        :param section_name: название секции, которую ищем
+        :return: текст найденной секции
+        """
+        # Если ищем секцию main_info, то берем самый первый фрагмент
         if section_name == "main_info":
             pattern = '|'.join(
                 ['|'.join([f"\s{name}\s|\s{name}:" for name in names]) for key, names in sections_dict.items()])
-            groups = re.search(rf'(.*?)({pattern}|\Z)', text,
+            groups = re.search(rf'(.*?)({pattern}|\Z)', self.text,
                                 re.DOTALL | re.IGNORECASE)
             if groups:
                 return groups.group(1)
             return None
 
+        # Шаблон для поиска секции section_name
         pattern1 = '|'.join([f"\s{name}\s|\s{name}:" for name in sections_dict[section_name]])
+        # Если ищем секцию с опытом работы или образованием, то исключаем некоторые слова для поиска.
         if section_name in ["work_experience", "education"]:
             pattern2 = '|'.join(
                 ['|'.join([f"\s{name}\s|\s{name}:" for name in names if name not in forbidden_words]) for key, names in sections_dict.items() if
                  key != section_name])
+        # Иначе используем обычный шаблон
         else:
             pattern2 = '|'.join(
                 ['|'.join([f"\s{name}\s|\s{name}:" for name in names]) for key, names in sections_dict.items() if
                  key != section_name])
-        groups = re.search(rf'({pattern1})(.*?)({pattern2}|\Z)', text,
+        groups = re.search(rf'({pattern1})(.*?)({pattern2}|\Z)', self.text,
                            re.DOTALL | re.IGNORECASE)
 
-        # Смотрим специфичные ситуации для секции навыков
-        if section_name == "skills" and groups:
-            pattern2 = '|'.join([f"\s{name}\s|\s{name}:" for name in sections_dict["languages"]])
-            specific_groups = re.search(rf'({pattern1})(.*?)({pattern2}|\Z)', groups.group(2),
-                       re.DOTALL | re.IGNORECASE)
-            if specific_groups:
-                return specific_groups.group(2)
 
         if groups:
-            # return max((group[1] for group in groups), key=len)
             return groups.group(2)
         return None
