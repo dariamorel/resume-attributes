@@ -1,9 +1,7 @@
 # Файл с различными методами
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
 
 from .forms import PDFFileForm
-import PyPDF2
 
 
 def show_home_page(request):

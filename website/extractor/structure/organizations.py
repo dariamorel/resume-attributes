@@ -19,7 +19,7 @@ class Organizations(Section):
         self.objects = None
 
         # Извлекаем даты
-        dates_text = text.replace('\n', '  ')
+        dates_text = text.replace('\n', ' ')
         dates = [date for date in all_dates_extractor.findall(dates_text)]
         # Находим связи между датами
         dates = self.__connected_dates(dates, dates_text)
@@ -41,7 +41,6 @@ class Organizations(Section):
 
         # Сортируем ents
         self.ents = sorted(ents, key=lambda x: x.start)
-
 
         if len(self.ents) == 0:
             return

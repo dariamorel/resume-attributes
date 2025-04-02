@@ -28,7 +28,6 @@ class MainInfo(Section):
         self.phone_number = None
         self.email = None
         self.website = None
-        self.position = None
 
         name_fact, name_text = self.__get_name()
         if name_fact:

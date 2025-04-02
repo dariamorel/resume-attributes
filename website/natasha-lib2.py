@@ -14,7 +14,7 @@ from natasha import (
 
     NamesExtractor,
     DatesExtractor,
-    Doc
+    Doc, obj
 )
 
 segmenter = Segmenter()
@@ -50,9 +50,7 @@ def main():
     # print(text)
 
     resume = Resume(text)
-    # for obj in resume.get_work_experience():
-    #     print(obj.date)
-    #     print(obj.orgs)
+    print(type(resume.main_info.name.fact))
 
 
 if __name__ == "__main__":
