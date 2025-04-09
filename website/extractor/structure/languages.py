@@ -7,7 +7,7 @@ import re
 
 class Languages(Section):
     def __init__(self, text):
-        text = text.replace('\n', '')
+        text = text.replace('\n', ' ')
         super().__init__(text, False)
         self.languages = self.__set_languages()
 

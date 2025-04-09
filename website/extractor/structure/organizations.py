@@ -13,13 +13,13 @@ class Organizations(Section):
         """
         Функция извлекает из текста даты и организации, преобразовывает их в объекты Ent и объединяет в объекты Object.
         """
-        super().__init__(text)
+        super().__init__(text, False)
         self.connected_dates = False
         self.connections_type = None
         self.objects = None
 
         # Извлекаем даты
-        dates_text = text.replace('\n', ' ')
+        dates_text = self.doc.text.replace('\n', ' ')
         dates = [date for date in all_dates_extractor.findall(dates_text)]
         # Находим связи между датами
         dates = self.__connected_dates(dates, dates_text)
@@ -57,9 +57,6 @@ class Organizations(Section):
         Функция определяет тип связи между датами и организациями в тексте.
         :return: количество организаций до даты в каждом фрагменте или -1, если дата в конце фрагмента
         """
-        if self.ents[-1].type == "DATE":
-            self.connections_type = -1
-            return
 
         i = 0
         while self.ents[i].type != "DATE":
@@ -81,20 +78,6 @@ class Organizations(Section):
         orgs = []
         date = None
         j = self.connections_type
-
-        # Если тип соединения -1 (дата в конце)
-        if self.connections_type == -1:
-            for ent in self.ents:
-                if ent.type == "DATE":
-                    if date and len(orgs) > 0:
-                        objects.append(Object(date, orgs.copy()))
-                        orgs.clear()
-                    date = ent
-                else:
-                    orgs.append(ent)
-            if date and len(orgs) > 0:
-                objects.append(Object(date, orgs.copy()))
-            return objects
 
         # Если тип соединения >= 0
         for i in range(len(self.ents) - j):

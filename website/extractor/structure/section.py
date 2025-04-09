@@ -30,7 +30,7 @@ class Section:
             text = delete_additional_info(text)
 
         # Заменяем символ '\n' на ',', чтобы упростить поиск именованных сущностей
-        spans_text = text.replace('\n', ", ")
+        spans_text = text.replace('\n', ",")
 
         doc = Doc(spans_text)
         doc.segment(segmenter)
